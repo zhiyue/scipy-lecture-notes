@@ -1,8 +1,11 @@
 
 ..  For doctests
-
+    
     >>> import numpy as np
     >>> np.random.seed(0)
+    >>> # For doctest on headless environments
+    >>> import matplotlib.pyplot as plt
+    >>> plt.switch_backend("Agg")
 
 .. currentmodule:: numpy
 
@@ -38,7 +41,7 @@ All arithmetic operates elementwise:
     >>> a - b
     array([-1.,  0.,  1.,  2.])
     >>> a * b
-    array([ 2.,  4.,  6.,  8.])
+    array([2.,  4.,  6.,  8.])
 
     >>> j = np.arange(5)
     >>> 2**(j + 1) - j
@@ -62,18 +65,18 @@ These operations are of course much faster than if you did them in pure python:
 
         >>> c = np.ones((3, 3))
         >>> c * c                   # NOT matrix multiplication!
-        array([[ 1.,  1.,  1.],
-               [ 1.,  1.,  1.],
-               [ 1.,  1.,  1.]])
+        array([[1.,  1.,  1.],
+               [1.,  1.,  1.],
+               [1.,  1.,  1.]])
 
 .. note:: **Matrix multiplication:**
 
     .. sourcecode:: pycon
 
         >>> c.dot(c)
-        array([[ 3.,  3.,  3.],
-               [ 3.,  3.,  3.],
-               [ 3.,  3.,  3.]])
+        array([[3.,  3.,  3.],
+               [3.,  3.,  3.],
+               [3.,  3.,  3.]])
 
 .. topic:: **Exercise: Elementwise operations**
    :class: green
@@ -97,9 +100,9 @@ Other operations
     >>> a = np.array([1, 2, 3, 4])
     >>> b = np.array([4, 2, 2, 4])
     >>> a == b
-    array([False,  True, False,  True], dtype=bool)
+    array([False,  True, False,  True])
     >>> a > b
-    array([False, False,  True, False], dtype=bool)
+    array([False, False,  True, False])
 
 .. tip::
 
@@ -123,9 +126,9 @@ Other operations
     >>> a = np.array([1, 1, 0, 0], dtype=bool)
     >>> b = np.array([1, 0, 1, 0], dtype=bool)
     >>> np.logical_or(a, b)
-    array([ True,  True,  True, False], dtype=bool)
+    array([ True,  True,  True, False])
     >>> np.logical_and(a, b)
-    array([ True, False, False, False], dtype=bool)
+    array([ True, False, False, False])
 
 **Transcendental functions:**
 
@@ -133,12 +136,11 @@ Other operations
 
     >>> a = np.arange(5)
     >>> np.sin(a)
-    array([ 0.        ,  0.84147098,  0.90929743,  0.14112001, -0.7568025])
+    array([ 0.        ,  0.84147098,  0.90929743,  0.14112001, -0.7568025 ])
     >>> np.log(a)
     array([       -inf,  0.        ,  0.69314718,  1.09861229,  1.38629436])
     >>> np.exp(a)
-    array([  1.00000000e+00,   2.71828183e+00,   7.38905610e+00,
-             2.00855369e+01,   5.45981500e+01])
+    array([  1.        ,   2.71828183,   7.3890561 ,  20.08553692,  54.59815003])
 
 
 **Shape mismatches**
@@ -159,21 +161,24 @@ Other operations
 
     >>> a = np.triu(np.ones((3, 3)), 1)   # see help(np.triu)
     >>> a
-    array([[ 0.,  1.,  1.],
-           [ 0.,  0.,  1.],
-           [ 0.,  0.,  0.]])
+    array([[0.,  1.,  1.],
+           [0.,  0.,  1.],
+           [0.,  0.,  0.]])
     >>> a.T
-    array([[ 0.,  0.,  0.],
-           [ 1.,  0.,  0.],
-           [ 1.,  1.,  0.]])
+    array([[0.,  0.,  0.],
+           [1.,  0.,  0.],
+           [1.,  1.,  0.]])
 
 
 .. warning:: **The transposition is a view**
 
-    As a results, the following code **is wrong** and will **not make a
+    As a result, the following code **is wrong** and will **not make a
     matrix symmetric**::
 
         >>> a += a.T
+
+    It will work for small arrays (because of buffering) but fail for
+    large one, in unpredictable ways.
 
 .. note:: **Linear algebra**
 
@@ -294,7 +299,7 @@ Other reductions
   >>> np.median(x)
   1.5
   >>> np.median(y, axis=-1) # last axis
-  array([ 2.,  5.])
+  array([2.,  5.])
 
   >>> x.std()          # full population standard dev.
   0.82915619758884995
@@ -321,7 +326,7 @@ Other reductions
 
      In [1]: !cat data/populations.txt
 
-   First, load the data into a Numpy array:
+   First, load the data into a NumPy array:
 
    .. sourcecode:: pycon
 
@@ -337,7 +342,10 @@ Other reductions
      >>> plt.plot(year, hares, year, lynxes, year, carrots) # doctest: +SKIP
      >>> plt.legend(('Hare', 'Lynx', 'Carrot'), loc=(1.05, 0.5)) # doctest: +SKIP
 
-   .. plot:: pyplots/numpy_intro_4.py
+   .. image:: auto_examples/images/sphx_glr_plot_populations_001.png
+      :width: 50%
+      :target: auto_examples/plot_populations.html
+      :align: center
 
    The mean populations over time:
 
@@ -345,14 +353,14 @@ Other reductions
 
      >>> populations = data[:, 1:]
      >>> populations.mean(axis=0)
-     array([ 34080.95238095,  20166.66666667,  42400.        ])
+     array([34080.95238095,  20166.66666667,  42400.        ])
 
    The sample standard deviations:
 
    .. sourcecode:: pycon
 
      >>> populations.std(axis=0)
-     array([ 20897.90645809,  16254.59153691,   3322.50622558])
+     array([20897.90645809,  16254.59153691,   3322.50622558])
 
    Which species has the highest population each year?:
 
@@ -399,7 +407,7 @@ Other reductions
   .. sourcecode:: pycon
 
    >>> t = np.arange(t_max)
-   >>> steps = 2 * np.random.random_integers(0, 1, (n_stories, t_max)) - 1
+   >>> steps = 2 * np.random.randint(0, 1 + 1, (n_stories, t_max)) - 1 # +1 because the high value is exclusive
    >>> np.unique(steps) # Verification: all steps are 1 or -1
    array([-1,  1])
 
@@ -421,15 +429,19 @@ Other reductions
   .. sourcecode:: pycon
 
    >>> plt.figure(figsize=(4, 3)) # doctest: +ELLIPSIS
-   <matplotlib.figure.Figure object at ...>
+   <Figure size ... with 0 Axes>
    >>> plt.plot(t, np.sqrt(mean_sq_distance), 'g.', t, np.sqrt(t), 'y-') # doctest: +ELLIPSIS
    [<matplotlib.lines.Line2D object at ...>, <matplotlib.lines.Line2D object at ...>]
    >>> plt.xlabel(r"$t$") # doctest: +ELLIPSIS
-   <matplotlib.text.Text object at ...>
+   Text(...'$t$')
    >>> plt.ylabel(r"$\sqrt{\langle (\delta x)^2 \rangle}$") # doctest: +ELLIPSIS
-   <matplotlib.text.Text object at ...>
+   Text(...'$\\sqrt{\\langle (\\delta x)^2 \\rangle}$')
+   >>> plt.tight_layout() # provide sufficient space for labels
 
-  .. plot:: pyplots/numpy_intro_5.py
+  .. image:: auto_examples/images/sphx_glr_plot_randomwalk_001.png
+     :width: 50%
+     :target: auto_examples/plot_randomwalk.html
+     :align: center
 
   We find a well-known result in physics: the RMS distance grows as the
   square root of the time!
@@ -459,7 +471,7 @@ Broadcasting
 * This works on arrays of the same size.
 
     | **Nevertheless**, It's also possible to do operations on arrays of different
-    | sizes if *Numpy* can transform these arrays so that they all have
+    | sizes if *NumPy* can transform these arrays so that they all have
     | the same size: this conversion is called **broadcasting**.
 
 The image below gives an example of broadcasting:
@@ -499,12 +511,12 @@ We have already used broadcasting without knowing it!:
     >>> a = np.ones((4, 5))
     >>> a[0] = 2  # we assign an array of dimension 0 to an array of dimension 1
     >>> a
-    array([[ 2.,  2.,  2.,  2.,  2.],
-           [ 1.,  1.,  1.,  1.,  1.],
-           [ 1.,  1.,  1.,  1.,  1.],
-           [ 1.,  1.,  1.,  1.,  1.]])
+    array([[2.,  2.,  2.,  2.,  2.],
+           [1.,  1.,  1.,  1.,  1.],
+           [1.,  1.,  1.,  1.,  1.],
+           [1.,  1.,  1.,  1.,  1.]])
 
-An useful trick:
+A useful trick:
 
 .. sourcecode:: pycon
 
@@ -563,18 +575,18 @@ An useful trick:
 
 A lot of grid-based or network-based problems can also use
 broadcasting. For instance, if we want to compute the distance from
-the origin of points on a 10x10 grid, we can do
+the origin of points on a 5x5 grid, we can do
 
 .. sourcecode:: pycon
 
     >>> x, y = np.arange(5), np.arange(5)[:, np.newaxis]
     >>> distance = np.sqrt(x ** 2 + y ** 2)
     >>> distance
-    array([[ 0.        ,  1.        ,  2.        ,  3.        ,  4.        ],
-           [ 1.        ,  1.41421356,  2.23606798,  3.16227766,  4.12310563],
-           [ 2.        ,  2.23606798,  2.82842712,  3.60555128,  4.47213595],
-           [ 3.        ,  3.16227766,  3.60555128,  4.24264069,  5.        ],
-           [ 4.        ,  4.12310563,  4.47213595,  5.        ,  5.65685425]])
+    array([[0.        ,  1.        ,  2.        ,  3.        ,  4.        ],
+           [1.        ,  1.41421356,  2.23606798,  3.16227766,  4.12310563],
+           [2.        ,  2.23606798,  2.82842712,  3.60555128,  4.47213595],
+           [3.        ,  3.16227766,  3.60555128,  4.24264069,  5.        ],
+           [4.        ,  4.12310563,  4.47213595,  5.        ,  5.65685425]])
 
 Or in color:
 
@@ -583,10 +595,13 @@ Or in color:
     >>> plt.pcolor(distance)    # doctest: +SKIP
     >>> plt.colorbar()    # doctest: +SKIP
 
-.. plot:: pyplots/numpy_intro_6.py
+.. image:: auto_examples/images/sphx_glr_plot_distances_001.png
+   :width: 50%
+   :target: auto_examples/plot_distances.html
+   :align: center
 
 
-**Remark** : the ``numpy.ogrid`` function allows to directly create vectors x
+**Remark** : the :func:`numpy.ogrid` function allows to directly create vectors x
 and y of the previous example, with two "significant dimensions":
 
 .. sourcecode:: pycon
@@ -634,6 +649,10 @@ and y of the previous example, with two "significant dimensions":
 .. EXE: multiply matrix from the right with a diagonal array
 .. CHA: constructing grids -- meshgrid using only newaxis
 
+.. seealso::
+   
+   :ref:`broadcasting_advanced`: discussion of broadcasting in
+   the :ref:`advanced_numpy` chapter.
 
 
 Array shape manipulation
@@ -701,9 +720,9 @@ Or,
      >>> b = a.T.reshape(3*2)
      >>> b[0] = 9
      >>> a
-     array([[ 0.,  0.],
-            [ 0.,  0.],
-            [ 0.,  0.]])
+     array([[0.,  0.],
+            [0.,  0.],
+            [0.,  0.]])
 
    To understand this you need to learn more about the memory layout of a numpy array.
 
@@ -895,7 +914,7 @@ Summary
   ``help()``, ``lookfor()``)!!
 
 * For advanced use: master the indexing with arrays of integers, as well as
-  broadcasting. Know more Numpy functions to handle various array
+  broadcasting. Know more NumPy functions to handle various array
   operations.
 
 .. topic:: **Quick read**

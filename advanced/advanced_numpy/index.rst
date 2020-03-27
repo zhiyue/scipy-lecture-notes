@@ -1,55 +1,54 @@
 .. For doctests
    >>> import numpy as np
    >>> np.random.seed(0)
+   >>> # For doctest on headless environments
    >>> from matplotlib import pyplot as plt
-
+   >>> plt.switch_backend('Agg')
 
 .. _advanced_numpy:
 
 ==============
-Advanced Numpy
+Advanced NumPy
 ==============
 
-:author: Pauli Virtanen
+**Author**: *Pauli Virtanen*
 
-Numpy is at the base of Python's scientific stack of tools.
-Its purpose is simple: implementing efficient operations on
-many items in a block of memory.  Understanding how it works
-in detail helps in making efficient use of its flexibility,
-taking useful shortcuts, and in building new work based on
-it.
+NumPy is at the base of Python's scientific stack of tools. Its purpose
+to implement efficient operations on many items in a block of memory.
+Understanding how it works in detail helps in making efficient use of its
+flexibility, taking useful shortcuts.
 
-This tutorial aims to cover:
+This section covers:
 
-- Anatomy of Numpy arrays, and its consequences. Tips and
+- Anatomy of NumPy arrays, and its consequences. Tips and
   tricks.
 
 - Universal functions: what, why, and what to do if you want
   a new one.
 
-- Integration with other tools: Numpy offers several ways to
+- Integration with other tools: NumPy offers several ways to
   wrap any data in an ndarray, without unnecessary copies.
 
-- Recently added features, and what's in them for me: PEP
+- Recently added features, and what's in them: PEP
   3118 buffers, generalized ufuncs, ...
 
 .. currentmodule:: numpy
 
-.. time limit: 1.5 hours; probably ~ 2 x 45 min
-
 .. topic:: Prerequisites
 
-    * Numpy (>= 1.2; preferably newer...)
-    * Cython (>= 0.12, for the Ufunc example)
-    * PIL (used in a couple of examples)
-
-In this section, numpy will be imported as follows::
-
-    >>> import numpy as np
+    * NumPy
+    * Cython
+    * Pillow (Python imaging library, used in a couple of examples)
 
 .. contents:: Chapter contents
    :local:
    :depth: 2
+
+.. tip::
+   
+   In this section, numpy will be imported as follows::
+
+    >>> import numpy as np
 
 
 Life of ndarray
@@ -94,11 +93,11 @@ It's...
 Block of memory
 ---------------
 
->>> x = np.array([1, 2, 3, 4], dtype=np.int32)
->>> x.data      # doctest: +SKIP
-<read-write buffer for ..., size 16, offset 0 at ...>
->>> str(x.data)
-'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00'
+>>> x = np.array([1, 2, 3], dtype=np.int32)
+>>> x.data      # doctest: +ELLIPSIS
+<... at ...>
+>>> bytes(x.data)  # doctest: +SKIP
+'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
 
 Memory address of the data:
 
@@ -107,7 +106,7 @@ Memory address of the data:
 
 The whole ``__array_interface__``:
 
->>> x.__array_interface__ 
+>>> x.__array_interface__  # doctest: +SKIP
 {'data': (35828928, False),
  'descr': [('', '<i4')],
  'shape': (4,),
@@ -125,10 +124,14 @@ Reminder: two :class:`ndarrays <ndarray>` may share the same memory::
 
 Memory does not need to be owned by an :class:`ndarray`::
 
-    >>> x = '1234'
+    >>> x = b'1234'      # The 'b' is for "bytes", necessary in Python 3
+
+x is a string (in Python 3 a bytes), we can represent its data as an
+array of ints::
+
     >>> y = np.frombuffer(x, dtype=np.int8)
     >>> y.data      # doctest: +ELLIPSIS
-    <read-only buffer for ..., size 4, offset 0 at ...>
+    <... at ...>
     >>> y.base is x
     True
 
@@ -138,13 +141,13 @@ Memory does not need to be owned by an :class:`ndarray`::
       OWNDATA : False
       WRITEABLE : False
       ALIGNED : True
+      WRITEBACKIFCOPY : False
       UPDATEIFCOPY : False
 
 The ``owndata`` and ``writeable`` flags indicate status of the memory
 block.
 
-See also : `array interface
-<http://docs.scipy.org/doc/numpy/reference/arrays.interface.html>`_
+.. seealso::: `array interface <http://docs.scipy.org/doc/numpy/reference/arrays.interface.html>`_
 
 Data types
 ----------
@@ -167,7 +170,7 @@ fields      sub-dtypes, if it's a **structured data type**
 shape       shape of the array, if it's a **sub-array**
 =========   ===================================================
 
->>> np.dtype(int).type
+>>> np.dtype(int).type      # doctest: +SKIP
 <type 'numpy.int64'>
 >>> np.dtype(int).itemsize
 8
@@ -199,35 +202,37 @@ data_size          4-byte unsigned little-endian integer
 - 44-byte block of raw data (in the beginning of the file)
 - ... followed by ``data_size`` bytes of actual sound data.
 
-The ``.wav`` file header as a Numpy *structured* data type:
+The ``.wav`` file header as a NumPy *structured* data type::
 
->>> wav_header_dtype = np.dtype([
-...     ("chunk_id", (str, 4)),   # flexible-sized scalar type, item size 4
-...     ("chunk_size", "<u4"),    # little-endian unsigned 32-bit integer
-...     ("format", "S4"),         # 4-byte string
-...     ("fmt_id", "S4"),
-...     ("fmt_size", "<u4"),
-...     ("audio_fmt", "<u2"),     #
-...     ("num_channels", "<u2"),  # .. more of the same ...
-...     ("sample_rate", "<u4"),   #
-...     ("byte_rate", "<u4"),
-...     ("block_align", "<u2"),
-...     ("bits_per_sample", "<u2"),
-...     ("data_id", ("S1", (2, 2))), # sub-array, just for fun!
-...     ("data_size", "u4"),
-...     #
-...     # the sound data itself cannot be represented here:
-...     # it does not have a fixed size
-...    ])
+    >>> wav_header_dtype = np.dtype([
+    ...     ("chunk_id", (bytes, 4)), # flexible-sized scalar type, item size 4
+    ...     ("chunk_size", "<u4"),    # little-endian unsigned 32-bit integer
+    ...     ("format", "S4"),         # 4-byte string
+    ...     ("fmt_id", "S4"),
+    ...     ("fmt_size", "<u4"),
+    ...     ("audio_fmt", "<u2"),     #
+    ...     ("num_channels", "<u2"),  # .. more of the same ...
+    ...     ("sample_rate", "<u4"),   #
+    ...     ("byte_rate", "<u4"),
+    ...     ("block_align", "<u2"),
+    ...     ("bits_per_sample", "<u2"),
+    ...     ("data_id", ("S1", (2, 2))), # sub-array, just for fun!
+    ...     ("data_size", "u4"),
+    ...     #
+    ...     # the sound data itself cannot be represented here:
+    ...     # it does not have a fixed size
+    ...    ])
 
 .. seealso:: wavreader.py
 
->>> wav_header_dtype['format']
-dtype('|S4')
->>> wav_header_dtype.fields     # doctest: +ELLIPSIS
-<dictproxy object at ...>
->>> wav_header_dtype.fields['format']
-(dtype('|S4'), 8)
+::
+
+    >>> wav_header_dtype['format']
+    dtype('S4')
+    >>> wav_header_dtype.fields     # doctest: +SKIP
+    dict_proxy({'block_align': (dtype('uint16'), 32), 'format': (dtype('S4'), 8), 'data_id': (dtype(('S1', (2, 2))), 36), 'fmt_id': (dtype('S4'), 12), 'byte_rate': (dtype('uint32'), 28), 'chunk_id': (dtype('S4'), 0), 'num_channels': (dtype('uint16'), 22), 'sample_rate': (dtype('uint32'), 24), 'bits_per_sample': (dtype('uint16'), 34), 'chunk_size': (dtype('uint32'), 4), 'fmt_size': (dtype('uint32'), 16), 'data_size': (dtype('uint32'), 40), 'audio_fmt': (dtype('uint16'), 20)})
+    >>> wav_header_dtype.fields['format']
+    (dtype('S4'), 8)
 
 - The first element is the sub-dtype in the structured data, corresponding
   to the name ``format``
@@ -250,15 +255,15 @@ dtype('|S4')
 
 >>> f = open('data/test.wav', 'r')
 >>> wav_header = np.fromfile(f, dtype=wav_header_dtype, count=1)
->>> f.close()
->>> print(wav_header)
+>>> f.close()  # doctest: +SKIP
+>>> print(wav_header)   # doctest: +SKIP
 [ ('RIFF', 17402L, 'WAVE', 'fmt ', 16L, 1, 1, 16000L, 32000L, 2, 16, [['d', 'a'], ['t', 'a']], 17366L)]
 >>> wav_header['sample_rate']
 array([16000], dtype=uint32)
 
 Let's try accessing the sub-array:
 
->>> wav_header['data_id']
+>>> wav_header['data_id']  # doctest: +SKIP
 array([[['d', 'a'],
         ['t', 'a']]], 
       dtype='|S1')
@@ -306,16 +311,16 @@ Casting
 
     >>> x = np.array([1, 2, 3, 4], dtype=np.float)
     >>> x
-    array([ 1.,  2.,  3.,  4.])
+    array([1.,  2.,  3.,  4.])
     >>> y = x.astype(np.int8)
     >>> y
     array([1, 2, 3, 4], dtype=int8)
     >>> y + 1
     array([2, 3, 4, 5], dtype=int8)
     >>> y + 256
-    array([1, 2, 3, 4], dtype=int8)
+    array([257, 258, 259, 260], dtype=int16)
     >>> y + 256.0
-    array([ 257.,  258.,  259.,  260.])
+    array([257.,  258.,  259.,  260.])
     >>> y + np.array([256], dtype=np.int32)
     array([257, 258, 259, 260], dtype=int32)
 
@@ -327,8 +332,8 @@ Casting
 
 .. note::
 
-   Exact rules: see documentation:
-   http://docs.scipy.org/doc/numpy/reference/ufuncs.html#casting-rules
+   Exact rules: see `numpy documentation
+   <http://docs.scipy.org/doc/numpy/reference/ufuncs.html#casting-rules>`_
 
 
 Re-interpretation / viewing
@@ -464,28 +469,30 @@ Indexing scheme: strides
 Main point
 ^^^^^^^^^^
 
-**The question**
+**The question**::
 
   >>> x = np.array([[1, 2, 3], 
-  ...	           [4, 5, 6], 
-  ...	           [7, 8, 9]], dtype=np.int8)
-  >>> str(x.data)
+  ...	            [4, 5, 6], 
+  ...	            [7, 8, 9]], dtype=np.int8)
+  >>> str(x.data)  # doctest: +SKIP
   '\x01\x02\x03\x04\x05\x06\x07\x08\t'
 
-  At which byte in ``x.data`` does the item ``x[1,2]`` begin?
+  At which byte in ``x.data`` does the item ``x[1, 2]`` begin?
 
-**The answer** (in Numpy)
+**The answer** (in NumPy)
 
   - **strides**: the number of bytes to jump to find the next element
   - 1 stride per dimension
 
-  >>> x.strides
-  (3, 1)
-  >>> byte_offset = 3*1 + 1*2   # to find x[1,2]
-  >>> x.data[byte_offset] 
-  '\x06'
-  >>> x[1, 2]
-  6
+.. code-block:: python
+
+    >>> x.strides
+    (3, 1)
+    >>> byte_offset = 3*1 + 1*2   # to find x[1, 2]
+    >>> x.flat[byte_offset] 
+    6
+    >>> x[1, 2]
+    6
 
   - simple, **flexible**
 
@@ -493,26 +500,28 @@ Main point
 C and Fortran order
 .....................
 
->>> x = np.array([[1, 2, 3], 
-...               [4, 5, 6], 
-...               [7, 8, 9]], dtype=np.int16, order='C')
->>> x.strides
-(6, 2)
->>> str(x.data)
-'\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00\x07\x00\x08\x00\t\x00'
+::
+
+    >>> x = np.array([[1, 2, 3], 
+    ...               [4, 5, 6]], dtype=np.int16, order='C')
+    >>> x.strides
+    (6, 2)
+    >>> str(x.data)  # doctest: +SKIP
+    '\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00'
 
 * Need to jump 6 bytes to find the next row
 * Need to jump 2 bytes to find the next column 
 
+::
 
->>> y = np.array(x, order='F')
->>> y.strides
-(2, 6)
->>> str(y.data)
-'\x01\x00\x04\x00\x07\x00\x02\x00\x05\x00\x08\x00\x03\x00\x06\x00\t\x00'
+    >>> y = np.array(x, order='F')
+    >>> y.strides
+    (2, 4)
+    >>> str(y.data)  # doctest: +SKIP
+    '\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00'
 
 * Need to jump 2 bytes to find the next row
-* Need to jump 6 bytes to find the next column 
+* Need to jump 4 bytes to find the next column 
 
 
 - Similarly to higher dimensions:
@@ -545,9 +554,9 @@ C and Fortran order
    >>> y.strides
    (1, 2)
 
-   >>> str(x.data)
+   >>> str(x.data)  # doctest: +SKIP
    '\x01\x02\x03\x04'
-   >>> str(y.data)
+   >>> str(y.data)  # doctest: +SKIP
    '\x01\x03\x02\x04'
 
    - the results are different when interpreted as 2 of int16
@@ -561,49 +570,51 @@ Slicing with integers
   and possibly adjusting the ``data`` pointer!
 - Never makes copies of the data
 
->>> x = np.array([1, 2, 3, 4, 5, 6], dtype=np.int32)
->>> y = x[::-1]
->>> y
-array([6, 5, 4, 3, 2, 1], dtype=int32)
->>> y.strides
-(-4,)
+::
 
->>> y = x[2:]
->>> y.__array_interface__['data'][0] - x.__array_interface__['data'][0]
-8
+    >>> x = np.array([1, 2, 3, 4, 5, 6], dtype=np.int32)
+    >>> y = x[::-1]
+    >>> y
+    array([6, 5, 4, 3, 2, 1], dtype=int32)
+    >>> y.strides
+    (-4,)
 
->>> x = np.zeros((10, 10, 10), dtype=np.float)
->>> x.strides
-(800, 80, 8)
->>> x[::2,::3,::4].strides
-(1600, 240, 32)
+    >>> y = x[2:]
+    >>> y.__array_interface__['data'][0] - x.__array_interface__['data'][0]
+    8
 
-- Similarly, transposes never make copies (it just swaps strides)
+    >>> x = np.zeros((10, 10, 10), dtype=np.float)
+    >>> x.strides
+    (800, 80, 8)
+    >>> x[::2,::3,::4].strides
+    (1600, 240, 32)
 
->>> x = np.zeros((10, 10, 10), dtype=np.float)
->>> x.strides
-(800, 80, 8)
->>> x.T.strides
-(8, 80, 800)
+- Similarly, transposes never make copies (it just swaps strides)::
+
+    >>> x = np.zeros((10, 10, 10), dtype=np.float)
+    >>> x.strides
+    (800, 80, 8)
+    >>> x.T.strides
+    (8, 80, 800)
 
 But: not all reshaping operations can be represented by playing with
-strides.
+strides::
 
->>> a = np.arange(6, dtype=np.int8).reshape(3, 2)
->>> b = a.T
->>> b.strides
-(1, 2)
+    >>> a = np.arange(6, dtype=np.int8).reshape(3, 2)
+    >>> b = a.T
+    >>> b.strides
+    (1, 2)
 
-So far, so good. However:
+So far, so good. However::
 
->>> str(a.data)
-'\x00\x01\x02\x03\x04\x05'
->>> b
-array([[0, 2, 4],
-       [1, 3, 5]], dtype=int8)
->>> c = b.reshape(3*2)
->>> c
-array([0, 2, 4, 1, 3, 5], dtype=int8)
+    >>> str(a.data)  # doctest: +SKIP
+    '\x00\x01\x02\x03\x04\x05'
+    >>> b
+    array([[0, 2, 4],
+           [1, 3, 5]], dtype=int8)
+    >>> c = b.reshape(3*2)
+    >>> c
+    array([0, 2, 4, 1, 3, 5], dtype=int8)
 
 Here, there is no way to represent the array ``c`` given one stride
 and the block of memory for ``a``. Therefore, the ``reshape``
@@ -672,7 +683,7 @@ array([1, 3], dtype=int16)
        </div>
 
 
-.. _broadcasting:
+.. _broadcasting_advanced:
 
 Broadcasting
 ^^^^^^^^^^^^
@@ -754,7 +765,7 @@ More tricks: diagonals
       >>> as_strided(x[1:, 0], shape=(2, ), strides=((3+1)*x.itemsize, ))
       array([4, 8], dtype=int32)
 
-    .. note::
+    .. note:: **Using np.diag**
 
        >>> y = np.diag(x, k=1)
        >>> y
@@ -762,10 +773,11 @@ More tricks: diagonals
 
        However,
 
-       >>> y.flags.owndata
-       True
+       >>> y.flags.owndata  # doctest: +SKIP
+       False
 
-       It makes a copy?!
+       **Note** This behavior has changed: before numpy 1.9, np.diag
+       would make a copy.
 
     .. raw:: html
 
@@ -777,11 +789,11 @@ More tricks: diagonals
 
    Compute the tensor trace::
 
-    >>> x = np.arange(5*5*5*5).reshape(5,5,5,5)
+    >>> x = np.arange(5*5*5*5).reshape(5, 5, 5, 5)
     >>> s = 0
-    >>> for i in xrange(5):
-    ...    for j in xrange(5):
-    ...       s += x[j,i,j,i]
+    >>> for i in range(5):
+    ...    for j in range(5):
+    ...       s += x[j, i, j, i]
 
    by striding, and using ``sum()`` on the result. ::
 
@@ -845,39 +857,11 @@ Memory layout can affect performance:
 
 .. seealso::
 
-   `numexpr <http://code.google.com/p/numexpr/>`_ is designed to mitigate
-   cache effects in array computing.
+   * `numexpr <https://numexpr.readthedocs.io>`_ is designed to mitigate
+     cache effects when evaluating array expressions.
 
-
-Example: inplace operations (caveat emptor)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Sometimes,
-
-  >>> a -= b    # doctest: +SKIP
-
-  is not the same as
-
-  >>> a -= b.copy()    # doctest: +SKIP
-
->>> x = np.array([[1, 2], [3, 4]])
->>> x -= x.transpose()
->>> x
-array([[ 0, -1],
-       [ 4,  0]])
-
->>> y = np.array([[1, 2], [3, 4]])
->>> y -= y.T.copy()
->>> y
-array([[ 0, -1],
-       [ 1,  0]])
-
-- ``x`` and ``x.transpose()`` share data
-
-- ``x -= x.transpose()`` modifies the data element-by-element...
-
-- because ``x`` and ``x.transpose()`` have different striding,
-  modified data re-appears on the RHS
+   * `numba <https://numba.pydata.org/>`_ is a compiler for Python code,
+     that is aware of numpy arrays.
 
 Findings in dissection
 ----------------------
@@ -909,7 +893,7 @@ What they are?
 - Automatically support: broadcasting, casting, ...
 
 - The author of an ufunc only has to supply the elementwise operation,
-  Numpy takes care of the rest.
+  NumPy takes care of the rest.
 
 - The elementwise operation needs to be implemented in C (or, e.g., Cython)
 
@@ -942,7 +926,7 @@ Parts of an Ufunc
            }
        }
 
-2. The Numpy part, built by
+2. The NumPy part, built by
 
    .. sourcecode:: c
 
@@ -970,7 +954,7 @@ Parts of an Ufunc
 Making it easier
 ^^^^^^^^^^^^^^^^
 
-3. ``ufunc_loop`` is of very generic form, and Numpy provides
+3. ``ufunc_loop`` is of very generic form, and NumPy provides
    pre-made ones
 
    ================  =======================================================
@@ -1052,8 +1036,7 @@ Solution: building an ufunc from scratch
 
    Most of the boilerplate could be automated by these Cython modules:
 
-   http://wiki.cython.org/MarkLodato/CreatingUfuncs
-
+   https://github.com/cython/cython/wiki/MarkLodato-CreatingUfuncs
 
 .. rubric:: Several accepted input types
 
@@ -1133,22 +1116,31 @@ Generalized ufuncs
     * This is called the *"signature"* of the generalized ufunc
     * The dimensions on which the g-ufunc acts, are *"core dimensions"* 
 
-.. rubric:: Status in Numpy
+.. rubric:: Status in NumPy
 
-* g-ufuncs are in Numpy already ...
+* g-ufuncs are in NumPy already ...
 * new ones can be created with ``PyUFunc_FromFuncAndDataAndSignature``
-* ... but we don't ship with public g-ufuncs, except for testing, ATM
+* most linear-algebra functions are implemented as g-ufuncs to enable working
+  with stacked arrays::
 
->>> import numpy.core.umath_tests as ut
->>> ut.matrix_multiply.signature
-'(m,n),(n,p)->(m,p)'
+    >>> import numpy as np
+    >>> np.linalg.det(np.random.rand(3, 5, 5))
+    array([ 0.00965823, -0.13344729,  0.04583961])
+    >>> np.linalg._umath_linalg.det.signature
+    '(m,m)->()'
 
->>> x = np.ones((10, 2, 4))
->>> y = np.ones((10, 4, 5))
->>> ut.matrix_multiply(x, y).shape
-(10, 2, 5)
+* we also ship with a few g-ufuncs for testing, ATM::
 
-* the last two dimensions became *core dimensions*,
+    >>> import numpy.core.umath_tests as ut
+    >>> ut.matrix_multiply.signature
+    '(m,n),(n,p)->(m,p)'
+    
+    >>> x = np.ones((10, 2, 4))
+    >>> y = np.ones((10, 4, 5))
+    >>> ut.matrix_multiply(x, y).shape
+    (10, 2, 5)
+
+* in both examples the last two dimensions became *core dimensions*,
   and are modified as per the *signature*
 * otherwise, the g-ufunc operates "elementwise"
 
@@ -1201,10 +1193,10 @@ Suppose you
 
 1. Write a library than handles (multidimensional) binary data,
 
-2. Want to make it easy to manipulate the data with Numpy, or whatever
+2. Want to make it easy to manipulate the data with NumPy, or whatever
    other library,
 
-3. ... but would **not** like to have Numpy as a dependency.
+3. ... but would **not** like to have NumPy as a dependency.
 
 Currently, 3 solutions:
 
@@ -1223,16 +1215,17 @@ The old buffer protocol
 - C-level interface; ``PyBufferProcs tp_as_buffer`` in the type object
 - But it's integrated into Python  (e.g. strings support it) 
 
-Mini-exercise using PIL (Python Imaging Library):
+Mini-exercise using `Pillow <https://python-pillow.github.io/>`_ (Python
+Imaging Library):
 
 .. seealso:: pilbuffer.py
 
->>> import Image
+>>> from PIL import Image
 >>> data = np.zeros((200, 200, 4), dtype=np.int8)
 >>> data[:, :] = [255, 0, 0, 255] # Red
 >>> # In PIL, RGBA images consist of 32-bit integers whose bytes are [RR,GG,BB,AA]
 >>> data = data.view(np.int32).squeeze()
->>> img = Image.frombuffer("RGBA", (200, 200), data)
+>>> img = Image.frombuffer("RGBA", (200, 200), data, "raw", "RGBA", 0, 1)
 >>> img.save('test.png')
 
 **Q:**
@@ -1255,7 +1248,7 @@ Array interface protocol
 
 - Multidimensional buffers
 - Data type information present
-- Numpy-specific approach; slowly deprecated (but not going away)
+- NumPy-specific approach; slowly deprecated (but not going away)
 - Not integrated in Python otherwise
 
 .. seealso::
@@ -1263,27 +1256,38 @@ Array interface protocol
    Documentation:
    http://docs.scipy.org/doc/numpy/reference/arrays.interface.html
 
->>> x = np.array([[1, 2], [3, 4]])
->>> x.__array_interface__   # doctest: +SKIP
-{'data': (171694552, False),      # memory address of data, is readonly?
- 'descr': [('', '<i4')],          # data type descriptor
- 'typestr': '<i4',                # same, in another form
- 'strides': None,                 # strides; or None if in C-order
- 'shape': (2, 2),
- 'version': 3,
-}
+::
 
->>> import Image
->>> img = Image.open('data/test.png')
->>> img.__array_interface__     # doctest: +SKIP
-{'data': ...,
- 'shape': (200, 200, 4),
- 'typestr': '|u1'}
->>> x = np.asarray(img)
->>> x.shape
-(200, 200, 4)
->>> x.dtype
-dtype('uint8')
+    >>> x = np.array([[1, 2], [3, 4]])
+    >>> x.__array_interface__   # doctest: +SKIP
+    {'data': (171694552, False),      # memory address of data, is readonly?
+     'descr': [('', '<i4')],          # data type descriptor
+     'typestr': '<i4',                # same, in another form
+     'strides': None,                 # strides; or None if in C-order
+     'shape': (2, 2),
+     'version': 3,
+    }
+
+
+.. for doctest
+   >>> import matplotlib
+   >>> matplotlib.use('Agg')
+   >>> from matplotlib import pyplot as plt
+   >>> import os
+   >>> if not os.path.exists('data'): os.mkdir('data')
+   >>> plt.imsave('data/test.png', data)
+
+
+:: 
+    >>> from PIL import Image
+    >>> img = Image.open('data/test.png')
+    >>> img.__array_interface__     # doctest: +SKIP
+    {'data': ...,
+     'shape': (200, 200, 4),
+     'typestr': '|u1'}
+    >>> x = np.asarray(img)
+    >>> x.shape
+    (200, 200, 4)
 
 
 .. note::
@@ -1299,12 +1303,12 @@ Array siblings: :class:`chararray`, :class:`maskedarray`, :class:`matrix`
 --------------------------------------------------
 
 >>> x = np.array(['a', '  bbb', '  ccc']).view(np.chararray)
->>> x.lstrip(' ')
+>>> x.lstrip(' ')       # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
 chararray(['a', 'bbb', 'ccc'], 
-      dtype='|S5')
->>> x.upper()
+      dtype='...')
+>>> x.upper()       # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
 chararray(['A', '  BBB', '  CCC'], 
-      dtype='|S5')
+      dtype='...')
 
 .. note::
 
@@ -1324,10 +1328,9 @@ One way to describe this is to create a masked array::
 
     >>> mx = np.ma.masked_array(x, mask=[0, 0, 0, 1, 0])
     >>> mx
-    masked_array(data = [1 2 3 -- 5],
-                 mask = [False False False  True False],
-           fill_value = 999999)
-    <BLANKLINE>
+    masked_array(data=[1, 2, 3, --, 5],
+                 mask=[False, False, False,  True, False],
+           fill_value=999999)
 
 Masked mean ignores masked data::
 
@@ -1336,7 +1339,7 @@ Masked mean ignores masked data::
     >>> np.mean(mx)
     2.75
 
-.. warning:: Not all Numpy functions respect masks, for instance
+.. warning:: Not all NumPy functions respect masks, for instance
    ``np.dot``, so check the return types.
 
 The ``masked_array`` returns a **view** to the original array::
@@ -1352,24 +1355,24 @@ You can modify the mask by assigning::
 
     >>> mx[1] = np.ma.masked
     >>> mx
-    masked_array(data = [1 -- 3 -- 5],
-                 mask = [False  True False  True False],
-           fill_value = 999999)
+    masked_array(data=[1, --, 3, --, 5],
+                 mask=[False,  True, False,  True, False],
+           fill_value=999999)
     <BLANKLINE>
 
 The mask is cleared on assignment::
 
     >>> mx[1] = 9
     >>> mx
-    masked_array(data = [1 9 3 -- 5],
-                 mask = [False False False  True False],
-           fill_value = 999999)
+    masked_array(data=[1, 9, 3, --, 5],
+                 mask=[False, False, False,  True, False],
+           fill_value=999999)
     <BLANKLINE>
 
 The mask is also available directly::
 
     >>> mx.mask
-    array([False, False, False,  True, False], dtype=bool)
+    array([False, False, False,  True, False])
 
 The masked entries can be filled with a given value to get an usual
 array back::
@@ -1382,9 +1385,9 @@ The mask can also be cleared::
 
     >>> mx.mask = np.ma.nomask
     >>> mx
-    masked_array(data = [1 9 3 -99 5],
-                 mask = [False False False False False],
-           fill_value = 999999)
+    masked_array(data=[1, 9, 3, -99, 5],
+                 mask=[False, False, False, False, False],
+           fill_value=999999)
     <BLANKLINE>
 
 Domain-aware functions
@@ -1393,15 +1396,15 @@ Domain-aware functions
 The masked array package also contains domain-aware functions::
 
     >>> np.ma.log(np.array([1, 2, -1, -2, 3, -5]))
-    masked_array(data = [0.0 0.69314718056 -- -- 1.09861228867 --],
-                 mask = [False False  True  True False  True],
-           fill_value = 1e+20)
+    masked_array(data=[0.0, 0.6931471805599453, --, --, 1.0986122886681098, --],
+                 mask=[False, False,  True,  True, False,  True],
+           fill_value=1e+20)
     <BLANKLINE>
 
 .. note::
 
    Streamlined and more seamless support for dealing with missing data
-   in arrays is making its way into Numpy 1.7.  Stay tuned!
+   in arrays is making its way into NumPy 1.7.  Stay tuned!
 
 .. topic:: Example: Masked statistics
 
@@ -1421,14 +1424,14 @@ The masked array package also contains domain-aware functions::
     >>> populations[bad_years, 1] = np.ma.masked
 
     >>> populations.mean(axis=0)
-    masked_array(data = [40472.7272727 18627.2727273 42400.0],
-                 mask = [False False False],
-           fill_value = 1e+20)
+    masked_array(data=[40472.72727272727, 18627.272727272728, 42400.0],
+                 mask=[False, False, False],
+           fill_value=1e+20)
     <BLANKLINE>
     >>> populations.std(axis=0)
-    masked_array(data = [21087.656489 15625.7998142 3322.50622558],
-                 mask = [False False False],
-           fill_value = 1e+20)
+    masked_array(data=[21087.656489006717, 15625.799814240254, 3322.5062255844787],
+                 mask=[False, False, False],
+           fill_value=1e+20)
     <BLANKLINE>
 
    Note that Matplotlib knows about masked arrays::
@@ -1436,14 +1439,18 @@ The masked array package also contains domain-aware functions::
     >>> plt.plot(year, populations, 'o-')   # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at ...>, ...]
 
-   .. plot:: pyplots/numpy_intro_8.py
+.. image:: auto_examples/images/sphx_glr_plot_maskedstats_001.png
+   :width: 50%
+   :target: auto_examples/plot_maskedstats.html
+   :align: center
+
 
 :class:`recarray`: purely convenience
 ---------------------------------------
 
 >>> arr = np.array([('a', 1), ('b', 2)], dtype=[('x', 'S1'), ('y', int)])
 >>> arr2 = arr.view(np.recarray)
->>> arr2.x
+>>> arr2.x       # doctest: +SKIP
 chararray(['a', 'b'], 
       dtype='|S1')
 >>> arr2.y
@@ -1474,7 +1481,7 @@ Summary
 * Recent additions: PEP 3118, generalized ufuncs
 
 
-Contributing to Numpy/Scipy
+Contributing to NumPy/Scipy
 ===========================
 
     Get this tutorial: http://www.euroscipy.org/talk/882
@@ -1495,9 +1502,9 @@ Reporting bugs
 
 - Bug tracker (prefer **this**)
 
-  - http://projects.scipy.org/numpy
+  - https://github.com/numpy/numpy/issues
 
-  - http://projects.scipy.org/scipy
+  - https://github.com/scipy/scipy/issues
 
   - Click the "Register" link to get an account
 
@@ -1521,8 +1528,8 @@ Good bug report
     it fails with a cryptic error message::
 
         >>> np.random.permutation(12)
-        array([ 6, 11,  4, 10,  2,  8,  1,  7,  9,  3,  0,  5])
-        >>> np.random.permutation(12.)
+        array([11,  5,  8,  4,  6,  1,  9,  3,  7,  2, 10,  0])
+        >>> np.random.permutation(12.) #doctest: +SKIP
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
           File "mtrand.pyx", line 3311, in mtrand.RandomState.permutation
@@ -1536,7 +1543,7 @@ Good bug report
     It would be great if it could cast to integer or at least raise a
     proper error for non-integer types.
 
-    I'm using Numpy 1.4.1, built from the official tarball, on Windows
+    I'm using NumPy 1.4.1, built from the official tarball, on Windows
     64 with Visual studio 2008, on Python.org 64-bit Python.
 
 0. What are you trying to do?
@@ -1549,26 +1556,26 @@ Good bug report
 
 2. Platform (Windows / Linux / OSX, 32/64 bits, x86/PPC, ...)
 
-3. Version of Numpy/Scipy
+3. Version of NumPy/Scipy
 
-   >>> print np.__version__ # doctest: +ELLIPSIS
-   2...
+   >>> print(np.__version__) # doctest: +ELLIPSIS
+   1...
 
    **Check that the following is what you expect**
 
-   >>> print np.__file__ # doctest: +ELLIPSIS
+   >>> print(np.__file__) # doctest: +ELLIPSIS
    /...
 
-   In case you have old/broken Numpy installations lying around.
+   In case you have old/broken NumPy installations lying around.
 
-   If unsure, try to remove existing Numpy installations, and reinstall...
+   If unsure, try to remove existing NumPy installations, and reinstall...
 
 Contributing to documentation
 -----------------------------
 
 1. Documentation editor
 
-   - http://docs.scipy.org/numpy
+   - http://docs.scipy.org/doc/numpy
 
    - Registration
 
@@ -1582,7 +1589,7 @@ Contributing to documentation
 
        - "change your subscription options", at the bottom of 
 
-         http://mail.scipy.org/mailman/listinfo/scipy-dev
+         http://mail.python.org/mailman/listinfo/scipy-dev
 
      - Send a mail @ ``scipy-dev`` mailing list; ask for activation::
 
@@ -1590,14 +1597,14 @@ Contributing to documentation
 
           Hi,
 
-          I'd like to edit Numpy/Scipy docstrings. My account is XXXXX
+          I'd like to edit NumPy/Scipy docstrings. My account is XXXXX
 
 	  Cheers,
 	  N. N.
 
     - Check the style guide:
 
-      - http://docs.scipy.org/numpy/
+      - http://docs.scipy.org/doc/numpy/
 
       - Don't be intimidated; to fix a small thing, just fix it
 
@@ -1611,39 +1618,7 @@ Contributing to documentation
 Contributing features
 ---------------------
 
-0. Ask on mailing list, if unsure where it should go
-
-1. Write a patch, add an enhancement ticket on the bug tracket
-
-2. OR, create a Git branch implementing the feature + add enhancement ticket.
-
-   - Especially for big/invasive additions
-   - http://projects.scipy.org/numpy/wiki/GitMirror
-   - http://www.spheredev.org/wiki/Git_for_the_lazy
-
-   ::
-
-      # Clone numpy repository
-      git clone --origin svn http://projects.scipy.org/git/numpy.git numpy
-      cd numpy
-
-      # Create a feature branch
-      git checkout -b name-of-my-feature-branch  svn/trunk
-
-      <edit stuff>
-
-      git commit -a
-
-   - Create account on http://github.com  (or anywhere)
-
-   - Create a new repository @ Github
-
-   - Push your work to github
-
-   ::
-
-       git remote add github git@github:YOURUSERNAME/YOURREPOSITORYNAME.git
-       git push github name-of-my-feature-branch
+  The contribution of features is documented on https://docs.scipy.org/doc/numpy/dev/
 
 How to help, in general
 -----------------------

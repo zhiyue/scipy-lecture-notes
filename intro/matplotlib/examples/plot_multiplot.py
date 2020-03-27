@@ -1,27 +1,28 @@
-import pylab as pl
+"""
+Subplots
+=========
 
-ax = pl.subplot(2, 1, 1)
-ax.set_xticklabels([])
-ax.set_yticklabels([])
+Show multiple subplots in matplotlib.
+"""
 
-pl.text(-0.05, 1.02, " Multiplot:     pl.subplot(...)\n",
-      horizontalalignment='left',
-      verticalalignment='top',
-      size='xx-large',
-      bbox=dict(facecolor='white', alpha=1.0, width=400, height=65),
-      transform=ax.transAxes)
-pl.text(-0.05, 1.01, "\n\n    Plot several plots at once ",
-      horizontalalignment='left',
-      verticalalignment='top',
-      size='large',
-      transform=ax.transAxes)
+import matplotlib.pyplot as plt
 
-ax = pl.subplot(2, 2, 3)
-ax.set_xticklabels([])
-ax.set_yticklabels([])
+fig = plt.figure()
+fig.subplots_adjust(bottom=0.025, left=0.025, top = 0.975, right=0.975)
 
-ax = pl.subplot(2, 2, 4)
-ax.set_xticklabels([])
-ax.set_yticklabels([])
+plt.subplot(2, 1, 1)
+plt.xticks([]), plt.yticks([])
 
-pl.show()
+plt.subplot(2, 3, 4)
+plt.xticks([])
+plt.yticks([])
+
+plt.subplot(2, 3, 5)
+plt.xticks([])
+plt.yticks([])
+
+plt.subplot(2, 3, 6)
+plt.xticks([])
+plt.yticks([])
+
+plt.show()

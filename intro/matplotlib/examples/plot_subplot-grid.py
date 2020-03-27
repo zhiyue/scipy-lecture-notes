@@ -1,30 +1,37 @@
-import pylab as pl
+"""
+Subplot grid
+=============
 
-pl.figure(figsize=(6, 4))
-pl.subplot(2, 2, 1)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(2,2,1)', ha='center', va='center',
+An example showing the subplot grid in matplotlib.
+"""
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(6, 4))
+plt.subplot(2, 2, 1)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(2,2,1)', ha='center', va='center',
         size=20, alpha=.5)
 
-pl.subplot(2, 2, 2)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(2,2,2)', ha='center', va='center',
+plt.subplot(2, 2, 2)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(2,2,2)', ha='center', va='center',
         size=20, alpha=.5)
 
-pl.subplot(2, 2, 3)
-pl.xticks(())
-pl.yticks(())
+plt.subplot(2, 2, 3)
+plt.xticks([])
+plt.yticks([])
 
-pl.text(0.5, 0.5, 'subplot(2,2,3)', ha='center', va='center',
+plt.text(0.5, 0.5, 'subplot(2,2,3)', ha='center', va='center',
         size=20, alpha=.5)
 
-pl.subplot(2, 2, 4)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(2,2,4)', ha='center', va='center',
+plt.subplot(2, 2, 4)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(2,2,4)', ha='center', va='center',
         size=20, alpha=.5)
 
-pl.tight_layout()
-pl.show()
+plt.tight_layout()
+plt.show()

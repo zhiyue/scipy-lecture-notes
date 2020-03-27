@@ -1,3 +1,10 @@
+"""
+Granulometry
+============
+
+This example performs a simple granulometry analysis.
+"""
+
 import numpy as np
 from scipy import ndimage
 import matplotlib.pyplot as plt
@@ -12,7 +19,7 @@ def disk_structure(n):
 
 def granulometry(data, sizes=None):
     s = max(data.shape)
-    if sizes == None:
+    if sizes is None:
         sizes = range(1, s/2, 2)
     granulo = [ndimage.binary_opening(data, \
             structure=disk_structure(n)).sum() for n in sizes]

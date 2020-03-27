@@ -33,55 +33,55 @@ Examples
     >>> from numpy.random import rand
     >>> data = np.round(rand(2, 3))
     >>> data
-    array([[ 1.,  1.,  1.],
-           [ 1.,  0.,  1.]])
+    array([[1.,  1.,  1.],
+           [1.,  0.,  1.]])
 
 * assign the data using fancy indexing::
 
     >>> mtx[:2, [1, 2, 3]] = data
-    >>> mtx  # doctest: +NORMALIZE_WHITESPACE
-    <4x5 sparse matrix of type '<type 'numpy.float64'>'
+    >>> mtx  # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    <4x5 sparse matrix of type '<... 'numpy.float64'>'
             with 5 stored elements in LInked List format>
-    >>> print mtx   # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mtx)   # doctest: +NORMALIZE_WHITESPACE
       (0, 1)  1.0
       (0, 2)  1.0
       (0, 3)  1.0
       (1, 1)  1.0
       (1, 3)  1.0
     >>> mtx.todense()
-    matrix([[ 0.,  1.,  1.,  1.,  0.],
-            [ 0.,  1.,  0.,  1.,  0.],
-            [ 0.,  0.,  0.,  0.,  0.],
-            [ 0.,  0.,  0.,  0.,  0.]])
+    matrix([[0.,  1.,  1.,  1.,  0.],
+            [0.,  1.,  0.,  1.,  0.],
+            [0.,  0.,  0.,  0.,  0.],
+            [0.,  0.,  0.,  0.,  0.]])
     >>> mtx.toarray()
-    array([[ 0.,  1.,  1.,  1.,  0.],
-           [ 0.,  1.,  0.,  1.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  1.,  1.,  1.,  0.],
+           [0.,  1.,  0.,  1.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
 
 * more slicing and indexing::
 
     >>> mtx = sparse.lil_matrix([[0, 1, 2, 0], [3, 0, 1, 0], [1, 0, 0, 1]])
-    >>> mtx.todense()
+    >>> mtx.todense()    # doctest: +ELLIPSIS
     matrix([[0, 1, 2, 0],
             [3, 0, 1, 0],
-            [1, 0, 0, 1]])
-    >>> print mtx # doctest: +NORMALIZE_WHITESPACE
+            [1, 0, 0, 1]]...)
+    >>> print(mtx) # doctest: +NORMALIZE_WHITESPACE
       (0, 1)    1
       (0, 2)    2
       (1, 0)    3
       (1, 2)    1
       (2, 0)    1
       (2, 3)    1
-    >>> mtx[:2, :] # doctest: +NORMALIZE_WHITESPACE
-    <2x4 sparse matrix of type '<type 'numpy.int64'>'
+    >>> mtx[:2, :]  # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    <2x4 sparse matrix of type '<... 'numpy.int64'>'
       with 4 stored elements in LInked List format>
-    >>> mtx[:2, :].todense()
+    >>> mtx[:2, :].todense()    # doctest: +ELLIPSIS
     matrix([[0, 1, 2, 0],
-            [3, 0, 1, 0]])
-    >>> mtx[1:2, [0,2]].todense()
-    matrix([[3, 1]])
-    >>> mtx.todense()
+            [3, 0, 1, 0]]...)
+    >>> mtx[1:2, [0,2]].todense()    # doctest: +ELLIPSIS
+    matrix([[3, 1]]...)
+    >>> mtx.todense()    # doctest: +ELLIPSIS
     matrix([[0, 1, 2, 0],
             [3, 0, 1, 0],
-            [1, 0, 0, 1]])
+            [1, 0, 0, 1]]...)

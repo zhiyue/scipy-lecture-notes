@@ -1,6 +1,11 @@
 .. For doctests
    >>> import numpy as np
-   >>> from matplotlib import pyplot as plt
+   >>> # For doctest on headless environments
+   >>> import matplotlib
+   >>> matplotlib.use('Agg')
+   >>> import matplotlib.pyplot as plt
+   >>> plt.switch_backend("Agg")
+
 
 
 .. currentmodule:: numpy
@@ -15,7 +20,7 @@ Advanced operations
 Polynomials
 -----------
 
-Numpy also contains polynomials in different bases:
+NumPy also contains polynomials in different bases:
 
 For example, :math:`3x^2 + 2x - 1`::
 
@@ -33,11 +38,14 @@ For example, :math:`3x^2 + 2x - 1`::
     >>> y = np.cos(x) + 0.3*np.random.rand(20)
     >>> p = np.poly1d(np.polyfit(x, y, 3))
 
-    >>> t = np.linspace(0, 1, 200)
+    >>> t = np.linspace(0, 1, 200) # use a larger number of points for smoother plotting
     >>> plt.plot(x, y, 'o', t, p(t), '-')   # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at ...>, <matplotlib.lines.Line2D object at ...>]
 
-.. plot:: pyplots/numpy_intro_9.py
+.. image:: auto_examples/images/sphx_glr_plot_polyfit_001.png
+    :width: 50%
+    :target: auto_examples/plot_polyfit.html
+    :align: center
 
 See http://docs.scipy.org/doc/numpy/reference/routines.polynomials.poly1d.html
 for more.
@@ -45,7 +53,7 @@ for more.
 More polynomials (with more bases)
 ...................................
 
-Numpy also has a more sophisticated polynomial interface, which supports
+NumPy also has a more sophisticated polynomial interface, which supports
 e.g. the Chebyshev basis.
 
 :math:`3x^2 + 2x - 1`::
@@ -65,13 +73,15 @@ range ``[-1, 1]``::
     >>> y = np.cos(x) + 0.3*np.random.rand(2000)
     >>> p = np.polynomial.Chebyshev.fit(x, y, 90)
 
-    >>> t = np.linspace(-1, 1, 200)
     >>> plt.plot(x, y, 'r.')   # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.plot(t, p(t), 'k-', lw=3)   # doctest: +ELLIPSIS
+    >>> plt.plot(x, p(x), 'k-', lw=3)   # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at ...>]
 
-.. plot:: pyplots/numpy_intro_10.py
+.. image:: auto_examples/images/sphx_glr_plot_chebyfit_001.png
+    :width: 50%
+    :target: auto_examples/plot_chebyfit.html
+    :align: center
 
 The Chebyshev polynomials have some advantages in interpolation.
 
@@ -131,12 +141,22 @@ Using Matplotlib::
     <matplotlib.image.AxesImage object at ...>
     >>> plt.savefig('plot.png')
 
-    >>> plt.imsave('red_elephant', img[:,:,0], cmap=plt.cm.gray)
+    >>> plt.imsave('red_elephant.png', img[:,:,0], cmap=plt.cm.gray)
+
+.. image:: auto_examples/images/sphx_glr_plot_elephant_001.png
+    :width: 50%
+    :target: auto_examples/plot_elephant.html
+    :align: center
 
 This saved only one channel (of RGB)::
 
     >>> plt.imshow(plt.imread('red_elephant.png'))  # doctest: +ELLIPSIS
     <matplotlib.image.AxesImage object at ...>
+
+.. image:: auto_examples/images/sphx_glr_plot_elephant_002.png
+    :width: 50%
+    :target: auto_examples/plot_elephant.html
+    :align: center
 
 Other libraries::
 
@@ -145,13 +165,16 @@ Other libraries::
     >>> plt.imshow(plt.imread('tiny_elephant.png'), interpolation='nearest')  # doctest: +ELLIPSIS
     <matplotlib.image.AxesImage object at ...>
 
-.. plot:: pyplots/numpy_intro_3.py
+.. image:: auto_examples/images/sphx_glr_plot_elephant_003.png
+    :width: 50%
+    :target: auto_examples/plot_elephant.html
+    :align: center
 
 
-Numpy's own format
+NumPy's own format
 ...................
 
-Numpy has its own binary format, not portable but with efficient I/O::
+NumPy has its own binary format, not portable but with efficient I/O::
 
     >>> data = np.ones((3, 3))
     >>> np.save('pop.npy', data)
@@ -160,10 +183,11 @@ Numpy has its own binary format, not portable but with efficient I/O::
 Well-known (& more obscure) file formats
 .........................................
 
-* HDF5: `h5py <http://code.google.com/p/h5py/>`__, `PyTables <http://pytables.org>`__
+* HDF5: `h5py <http://www.h5py.org/>`__, `PyTables <http://www.pytables.org>`__
 * NetCDF: ``scipy.io.netcdf_file``, `netcdf4-python <http://code.google.com/p/netcdf4-python/>`__, ...
 * Matlab: ``scipy.io.loadmat``, ``scipy.io.savemat``
-* MatrixMarket: ``scipy.io.mmread``, ``scipy.io.mmread``
+* MatrixMarket: ``scipy.io.mmread``, ``scipy.io.mmwrite``
+* IDL: ``scipy.io.readsav``
 
 ... if somebody uses it, there's probably also a Python library for it.
 
@@ -189,8 +213,8 @@ Well-known (& more obscure) file formats
 .. EXE: advanced: read the data in a PPM file
 
 
-.. topic:: Numpy internals
+.. topic:: NumPy internals
 
-    If you are interested in the Numpy internals, there is a good discussion in
+    If you are interested in the NumPy internals, there is a good discussion in
     :ref:`advanced_numpy`.
 

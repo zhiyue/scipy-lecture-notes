@@ -1,6 +1,8 @@
 .. for doctests
    >>> import numpy as np
    >>> np.random.seed(0)
+   >>> import matplotlib.pyplot as plt
+   >>> plt.switch_backend("Agg")
 
 
 .. _basic_image:
@@ -9,10 +11,10 @@
 Image manipulation and processing using Numpy and Scipy
 =======================================================
 
-:authors: Emmanuelle Gouillart, Gaël Varoquaux
+**Authors**: *Emmanuelle Gouillart, Gaël Varoquaux*
 
 
-This chapter addresses basic image manipulation and processing using the
+This section addresses basic image manipulation and processing using the
 core scientific modules NumPy and SciPy. Some of the operations covered
 by this tutorial may be useful for other kinds of multidimensional array
 processing than image processing. In particular, the submodule
@@ -36,7 +38,8 @@ arrays.
 * ``numpy``: basic array manipulation
 
 * ``scipy``: ``scipy.ndimage`` submodule dedicated to image processing
-  (n-dimensional images). See http://docs.scipy.org/doc/scipy/reference/tutorial/ndimage.html ::
+  (n-dimensional images). See the `documentation
+  <http://docs.scipy.org/doc/scipy/reference/tutorial/ndimage.html>`_::
 
     >>> from scipy import ndimage
 
@@ -60,17 +63,6 @@ arrays.
 * ...
 
 
-More powerful and complete modules:
-
-* `OpenCV <http://opencv.willowgarage.com/documentation/python/cookbook.html>`_
-  (Python bindings)
-
-* `CellProfiler <http://www.cellprofiler.org>`_
-
-* `ITK <http://www.itk.org/>`_ with Python bindings
-
-* many more...
-
 .. contents:: Chapters contents
    :local:
    :depth: 4
@@ -82,48 +74,48 @@ Opening and writing to image files
 
 Writing an array to a file:
 
-.. literalinclude:: examples/plot_lena.py
-   :lines: 2-
+.. literalinclude:: examples/plot_face.py
+   :lines: 8-
 
-.. image:: examples/lena.png
+.. image:: examples/face.png
     :align: center
     :scale: 50
-
 
 Creating a numpy array from an image file::
 
     >>> from scipy import misc
-    >>> lena = misc.imread('lena.png')
-    >>> type(lena)
-    <type 'numpy.ndarray'>
-    >>> lena.shape, lena.dtype
-    ((512, 512), dtype('uint8'))
+    >>> face = misc.face()
+    >>> misc.imsave('face.png', face) # First we need to create the PNG file
+    
+    >>> face = misc.imread('face.png')
+    >>> type(face)      # doctest: +ELLIPSIS
+    <... 'numpy.ndarray'>
+    >>> face.shape, face.dtype
+    ((768, 1024, 3), dtype('uint8'))
 
 dtype is uint8 for 8-bit images (0-255)
 
 Opening raw files (camera, 3-D images) ::
 
-    >>> l.tofile('lena.raw') # Create raw file
-    >>> lena_from_raw = np.fromfile('lena.raw', dtype=np.int64)
-    >>> lena_from_raw.shape
-    (262144,)
-    >>> lena_from_raw.shape = (512, 512)
-    >>> import os
-    >>> os.remove('lena.raw')
+    >>> face.tofile('face.raw') # Create raw file
+    >>> face_from_raw = np.fromfile('face.raw', dtype=np.uint8)
+    >>> face_from_raw.shape
+    (2359296,)
+    >>> face_from_raw.shape = (768, 1024, 3)
 
 Need to know the shape and dtype of the image (how to separate data
 bytes).
 
 For large data, use ``np.memmap`` for memory mapping::
 
-    >>> lena_memmap = np.memmap('lena.raw', dtype=np.int64, shape=(512, 512))
+    >>> face_memmap = np.memmap('face.raw', dtype=np.uint8, shape=(768, 1024, 3))
 
 (data are read from the file, and not loaded into memory)
 
 Working on a list of image files ::
 
     >>> for i in range(10):
-    ...     im = np.random.random_integers(0, 255, 10000).reshape((100, 100))
+    ...     im = np.random.randint(0, 256, 10000).reshape((100, 100))
     ...     misc.imsave('random_%02d.png' % i, im)
     >>> from glob import glob
     >>> filelist = glob('random*.png')
@@ -135,49 +127,57 @@ Displaying images
 Use ``matplotlib`` and ``imshow`` to display an image inside a
 ``matplotlib figure``::
 
-    >>> l = misc.lena()
+    >>> f = misc.face(gray=True)  # retrieve a grayscale image
     >>> import matplotlib.pyplot as plt
-    >>> plt.imshow(l, cmap=plt.cm.gray)
-    <matplotlib.image.AxesImage object at 0x3c7f710>
+    >>> plt.imshow(f, cmap=plt.cm.gray)        # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
 
 Increase contrast by setting min and max values::
 
-    >>> plt.imshow(l, cmap=plt.cm.gray, vmin=30, vmax=200)
-    <matplotlib.image.AxesImage object at 0x33ef750>
+    >>> plt.imshow(f, cmap=plt.cm.gray, vmin=30, vmax=200)        # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
     >>> # Remove axes and ticks
     >>> plt.axis('off')
-    (-0.5, 511.5, 511.5, -0.5)
+    (-0.5, 1023.5, 767.5, -0.5)
 
 Draw contour lines::
 
-    >>> plt.contour(l, [60, 211])
-    <matplotlib.contour.ContourSet instance at 0x33f8c20>
+    >>> plt.contour(f, [50, 200])        # doctest: +ELLIPSIS
+    <matplotlib.contour.QuadContourSet ...>
 
 
-.. figure:: auto_examples/images/plot_display_lena_1.png
-    :scale: 100
-    :target: auto_examples/plot_display_lena.html
+.. figure:: auto_examples/images/sphx_glr_plot_display_face_001.png
+    :scale: 80
+    :target: auto_examples/plot_display_face.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_display_lena.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_display_face.py>`]
 
-For fine inspection of intensity variations, use
+For smooth intensity variations, use ``interpolation='bilinear'``. For fine inspection of intensity variations, use
 ``interpolation='nearest'``::
 
-    >>> plt.imshow(l[200:220, 200:220], cmap=plt.cm.gray)
-    >>> plt.imshow(l[200:220, 200:220], cmap=plt.cm.gray, interpolation='nearest')
+    >>> plt.imshow(f[320:340, 510:530], cmap=plt.cm.gray, interpolation='bilinear')        # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
+    >>> plt.imshow(f[320:340, 510:530], cmap=plt.cm.gray, interpolation='nearest')        # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
 
-.. figure:: auto_examples/images/plot_interpolation_lena_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_interpolation_face_001.png
     :scale: 80
-    :target: auto_examples/plot_interpolation_lena.html
+    :target: auto_examples/plot_interpolation_face.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_interpolation_lena.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_interpolation_face.py>`]
 
 
-.. topic:: 3-D visualization: Mayavi
+.. seealso::
+
+    More interpolation methods are in  `Matplotlib's examples <https://matplotlib.org/examples/images_contours_and_fields/interpolation_methods.html>`_.
+
+
+
+.. seealso:: 3-D visualization: Mayavi
 
     See :ref:`mayavi-label`.
 
@@ -187,10 +187,9 @@ For fine inspection of intensity variations, use
 
 	* ...
 
-..  FIXME: image does not exits??
-..    .. image:: ../3d_plotting/ipw.png
-..	:align: center
-..	:scale: 65
+.. image:: ../../packages/3d_plotting/decorations.png
+    :align: center
+    :scale: 65
 
 
 Basic manipulations
@@ -204,31 +203,31 @@ Images are arrays: use the whole ``numpy`` machinery.
 
 ::
 
-    >>> lena = scipy.misc.lena()
-    >>> lena[0, 40]
-    166
+    >>> face = misc.face(gray=True)
+    >>> face[0, 40]
+    127
     >>> # Slicing
-    >>> lena[10:13, 20:23]
-    array([[158, 156, 157],
-    [157, 155, 155],
-    [157, 157, 158]])
-    >>> lena[100:120] = 255
+    >>> face[10:13, 20:23]
+    array([[141, 153, 145],
+           [133, 134, 125],
+           [ 96,  92,  94]], dtype=uint8)
+    >>> face[100:120] = 255
     >>>
-    >>> lx, ly = lena.shape
+    >>> lx, ly = face.shape
     >>> X, Y = np.ogrid[0:lx, 0:ly]
     >>> mask = (X - lx / 2) ** 2 + (Y - ly / 2) ** 2 > lx * ly / 4
     >>> # Masks
-    >>> lena[mask] = 0
+    >>> face[mask] = 0
     >>> # Fancy indexing
-    >>> lena[range(400), range(400)] = 255
+    >>> face[range(400), range(400)] = 255
 
-.. figure:: auto_examples/images/plot_numpy_array_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_numpy_array_001.png
     :scale: 100
     :target: auto_examples/plot_numpy_array.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_numpy_array.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_numpy_array.py>`]
 
 
 Statistical information
@@ -236,11 +235,11 @@ Statistical information
 
 ::
 
-    >>> lena = misc.lena()
-    >>> lena.mean()
-    124.04678344726562
-    >>> lena.max(), lena.min()
-    (245, 25)
+    >>> face = misc.face(gray=True)
+    >>> face.mean()
+    113.48026784261067
+    >>> face.max(), face.min()
+    (250, 0)
 
 
 ``np.histogram``
@@ -250,13 +249,13 @@ Statistical information
     
 
     * Open as an array the ``scikit-image`` logo
-      (http://scikit-image.org/_static/scikits_image_logo.png), or an
+      (http://scikit-image.org/_static/img/logo.png), or an
       image that you have on your computer.
 
     * Crop a meaningful part of the image, for example the python circle
       in the logo.
 
-    * Display the image array using ``matlplotlib``. Change the
+    * Display the image array using ``matplotlib``. Change the
       interpolation method and zoom to see the difference.
 
     * Transform your image to greyscale
@@ -268,7 +267,7 @@ Statistical information
 
     * Save the array to two different file formats (png, jpg, tiff)
 
-    .. image:: scikits_image_logo.png
+    .. image:: scikit_image_logo.png
         :align: center
 
 
@@ -276,23 +275,23 @@ Geometrical transformations
 ---------------------------
 ::
 
-    >>> lena = misc.lena()
-    >>> lx, ly = lena.shape
+    >>> face = misc.face(gray=True)
+    >>> lx, ly = face.shape
     >>> # Cropping
-    >>> crop_lena = lena[lx / 4: - lx / 4, ly / 4: - ly / 4]
+    >>> crop_face = face[lx // 4: - lx // 4, ly // 4: - ly // 4]
     >>> # up <-> down flip
-    >>> flip_ud_lena = np.flipud(lena)
+    >>> flip_ud_face = np.flipud(face)
     >>> # rotation
-    >>> rotate_lena = ndimage.rotate(lena, 45)
-    >>> rotate_lena_noreshape = ndimage.rotate(lena, 45, reshape=False)
+    >>> rotate_face = ndimage.rotate(face, 45)
+    >>> rotate_face_noreshape = ndimage.rotate(face, 45, reshape=False)
 
-.. figure:: auto_examples/images/plot_geom_lena_1.png
-    :scale: 80
-    :target: auto_examples/plot_geom_lena.html
+.. figure:: auto_examples/images/sphx_glr_plot_geom_face_001.png
+    :scale: 65
+    :target: auto_examples/plot_geom_face.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_geom_lena.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_geom_face.py>`]
 
 Image filtering
 ===============
@@ -313,21 +312,21 @@ Blurring/smoothing
 **Gaussian filter** from ``scipy.ndimage``::
 
     >>> from scipy import misc
-    >>> lena = misc.lena()
-    >>> blurred_lena = ndimage.gaussian_filter(lena, sigma=3)
-    >>> very_blurred = ndimage.gaussian_filter(lena, sigma=5)
+    >>> face = misc.face(gray=True)
+    >>> blurred_face = ndimage.gaussian_filter(face, sigma=3)
+    >>> very_blurred = ndimage.gaussian_filter(face, sigma=5)
 
 **Uniform filter** ::
 
-    >>> local_mean = ndimage.uniform_filter(lena, size=11)
+    >>> local_mean = ndimage.uniform_filter(face, size=11)
 
-.. figure:: auto_examples/images/plot_blur_1.png
-    :scale: 80
+.. figure:: auto_examples/images/sphx_glr_plot_blur_001.png
+    :scale: 90
     :target: auto_examples/plot_blur.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_blur.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_blur.py>`]
 
 Sharpening
 ----------
@@ -335,34 +334,34 @@ Sharpening
 Sharpen a blurred image::
 
     >>> from scipy import misc
-    >>> lena = misc.lena()
-    >>> blurred_l = ndimage.gaussian_filter(lena, 3)
+    >>> face = misc.face(gray=True).astype(float)
+    >>> blurred_f = ndimage.gaussian_filter(face, 3)
 
 increase the weight of edges by adding an approximation of the
 Laplacian::
 
-    >>> filter_blurred_l = ndimage.gaussian_filter(blurred_l, 1)
+    >>> filter_blurred_f = ndimage.gaussian_filter(blurred_f, 1)
     >>> alpha = 30
-    >>> sharpened = blurred_l + alpha * (blurred_l - filter_blurred_l)
+    >>> sharpened = blurred_f + alpha * (blurred_f - filter_blurred_f)
 
-.. figure:: auto_examples/images/plot_sharpen_1.png
-    :scale: 100
+.. figure:: auto_examples/images/sphx_glr_plot_sharpen_001.png
+    :scale: 65
     :target: auto_examples/plot_sharpen.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_sharpen.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_sharpen.py>`]
 
 
 Denoising
 ---------
 
-Noisy lena::
+Noisy face::
 
     >>> from scipy import misc
-    >>> l = misc.lena()
-    >>> l = l[230:310, 210:350]
-    >>> noisy = l + 0.4 * l.std() * np.random.random(l.shape)
+    >>> f = misc.face(gray=True)
+    >>> f = f[230:290, 220:320]
+    >>> noisy = f + 0.4 * f.std() * np.random.random(f.shape)
 
 A **Gaussian filter** smoothes the noise out... and the edges as well::
 
@@ -374,13 +373,13 @@ A **median filter** preserves better the edges::
 
     >>> med_denoised = ndimage.median_filter(noisy, 3)
 
-.. figure:: auto_examples/images/plot_lena_denoise_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_face_denoise_001.png
     :scale: 60
-    :target: auto_examples/plot_lena_denoise.html
+    :target: auto_examples/plot_face_denoise.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_lena_denoise.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_face_denoise.py>`]
 
 
 Median filter: better result for straight boundaries (**low curvature**)::
@@ -391,13 +390,13 @@ Median filter: better result for straight boundaries (**low curvature**)::
     >>> im_noise = im + 0.2 * np.random.randn(*im.shape)
     >>> im_med = ndimage.median_filter(im_noise, 3)
 
-.. figure:: auto_examples/images/plot_denoising_1.png
-    :scale: 60
+.. figure:: auto_examples/images/sphx_glr_plot_denoising_001.png
+    :scale: 50
     :target: auto_examples/plot_denoising.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_denoising.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_denoising.py>`]
 
 
 Other rank filter: ``ndimage.maximum_filter``,
@@ -422,11 +421,18 @@ Other local non-linear filters: Wiener (``scipy.signal.wiener``), etc.
       Which one is the closest to the histogram of the original (noise-free)
       image?
 
+.. seealso::
+
+    More denoising filters are available in :mod:`skimage.denoising`,
+    see the :ref:`scikit_image` tutorial.
+
+
 
 Mathematical morphology
 -----------------------
 
-See http://en.wikipedia.org/wiki/Mathematical_morphology
+See `wikipedia <https://en.wikipedia.org/wiki/Mathematical_morphology>`_
+for a definition of mathematical morphology.
 
 Probe an image with a simple shape (a **structuring element**), and
 modify this image according to how the shape locally fits or misses the
@@ -438,7 +444,7 @@ image.
     >>> el
     array([[False,  True, False],
            [ True,  True,  True],
-           [False,  True, False]], dtype=bool)
+           [False,  True, False]])
     >>> el.astype(np.int)
     array([[0, 1, 0],
            [1, 1, 1],
@@ -487,22 +493,23 @@ image.
     >>> a = np.zeros((5, 5))
     >>> a[2, 2] = 1
     >>> a
-    array([[ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
     >>> ndimage.binary_dilation(a).astype(a.dtype)
-    array([[ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  1.,  1.,  1.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  1.,  1.,  1.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
 
 
 Also works for grey-valued images::
 
     >>> np.random.seed(2)
+    >>> im = np.zeros((64, 64))
     >>> x, y = (63*np.random.random((2, 8))).astype(np.int)
     >>> im[x, y] = np.arange(8)
 
@@ -515,13 +522,13 @@ Also works for grey-valued images::
     ...         structure=np.ones((3, 3)))
 
 
-.. figure:: auto_examples/images/plot_greyscale_dilation_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_greyscale_dilation_001.png
     :scale: 40
     :target: auto_examples/plot_greyscale_dilation.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_greyscale_dilation.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_greyscale_dilation.py>`]
 
 **Opening**: erosion + dilation::
 
@@ -561,13 +568,13 @@ Also works for grey-valued images::
     >>> eroded_square = ndimage.binary_erosion(square)
     >>> reconstruction = ndimage.binary_propagation(eroded_square, mask=square)
 
-.. figure:: auto_examples/images/plot_propagation_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_propagation_001.png
     :scale: 40
     :target: auto_examples/plot_propagation.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_propagation.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_propagation.py>`]
 
 **Closing**: dilation + erosion
 
@@ -594,13 +601,13 @@ Use a **gradient operator** (**Sobel**) to find high intensity variations::
     >>> sy = ndimage.sobel(im, axis=1, mode='constant')
     >>> sob = np.hypot(sx, sy)
 
-.. figure:: auto_examples/images/plot_find_edges_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_find_edges_001.png
     :scale: 40
     :target: auto_examples/plot_find_edges.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_find_edges.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_find_edges.py>`]
 
 
 Segmentation
@@ -627,13 +634,13 @@ Segmentation
 
     >>> binary_img = img > 0.5
 
-.. figure:: auto_examples/images/plot_histo_segmentation_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_histo_segmentation_001.png
     :scale: 65
     :target: auto_examples/plot_histo_segmentation.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_histo_segmentation.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_histo_segmentation.py>`]
 
 Use mathematical morphology to clean up the result::
 
@@ -642,13 +649,13 @@ Use mathematical morphology to clean up the result::
     >>> # Remove small black hole
     >>> close_img = ndimage.binary_closing(open_img)
 
-.. figure:: auto_examples/images/plot_clean_morpho_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_clean_morpho_001.png
     :scale: 65
     :target: auto_examples/plot_clean_morpho.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_clean_morpho.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_clean_morpho.py>`]
 
 .. topic:: **Exercise**
     :class: green
@@ -661,10 +668,10 @@ Use mathematical morphology to clean up the result::
 	>>> tmp = np.logical_not(reconstruct_img)
 	>>> eroded_tmp = ndimage.binary_erosion(tmp)
 	>>> reconstruct_final = np.logical_not(ndimage.binary_propagation(eroded_tmp, mask=tmp))
-	>>> np.abs(mask - close_img).mean()
-	0.014678955078125
-	>>> np.abs(mask - reconstruct_final).mean()
-	0.0042572021484375
+	>>> np.abs(mask - close_img).mean() # doctest: +ELLIPSIS
+	0.00727836...
+	>>> np.abs(mask - reconstruct_final).mean() # doctest: +ELLIPSIS
+	0.00059502...
 
 .. topic:: **Exercise**
     :class: green
@@ -719,7 +726,7 @@ Use mathematical morphology to clean up the result::
         >>> # dependant from the gradient the segmentation is close to a voronoi
         >>> graph.data = np.exp(-graph.data/graph.data.std())
 
-        >>> labels = spectral_clustering(graph, k=4, mode='arpack')
+        >>> labels = spectral_clustering(graph, n_clusters=4, eigen_solver='arpack')
         >>> label_im = -np.ones(mask.shape)
         >>> label_im[mask] = labels
 
@@ -748,17 +755,17 @@ Label connected components: ``ndimage.label``::
 
     >>> label_im, nb_labels = ndimage.label(mask)
     >>> nb_labels # how many regions?
-    23
+    28
     >>> plt.imshow(label_im)        # doctest: +ELLIPSIS
-    <matplotlib.image.AxesImage object at ...>
+    <matplotlib.image.AxesImage object at 0x...>
 
-.. figure:: auto_examples/images/plot_synthetic_data_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_synthetic_data_001.png
     :scale: 90
     :target: auto_examples/plot_synthetic_data.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_synthetic_data.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_synthetic_data.py>`]
 
 Compute size, mean_value, etc. of each region::
 
@@ -773,35 +780,35 @@ Clean up small connect components::
     (256, 256)
     >>> label_im[remove_pixel] = 0
     >>> plt.imshow(label_im)        # doctest: +ELLIPSIS
-    <matplotlib.image.AxesImage object at ...>
+    <matplotlib.image.AxesImage object at 0x...>
 
 Now reassign labels with ``np.searchsorted``::
 
     >>> labels = np.unique(label_im)
     >>> label_im = np.searchsorted(labels, label_im)
 
-.. figure:: auto_examples/images/plot_measure_data_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_measure_data_001.png
     :scale: 90
     :target: auto_examples/plot_measure_data.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_measure_data.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_measure_data.py>`]
 
 Find region of interest enclosing object::
 
     >>> slice_x, slice_y = ndimage.find_objects(label_im==4)[0]
     >>> roi = im[slice_x, slice_y]
     >>> plt.imshow(roi)     # doctest: +ELLIPSIS
-    <matplotlib.image.AxesImage object at ...>
+    <matplotlib.image.AxesImage object at 0x...>
 
-.. figure:: auto_examples/images/plot_find_object_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_find_object_001.png
     :scale: 130
     :target: auto_examples/plot_find_object.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_find_object.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_find_object.py>`]
 
 Other spatial measures: ``ndimage.center_of_mass``,
 ``ndimage.maximum_position``, etc.
@@ -811,48 +818,48 @@ Can be used outside the limited scope of segmentation applications.
 Example: block mean::
 
     >>> from scipy import misc
-    >>> l = misc.lena()
-    >>> sx, sy = l.shape
+    >>> f = misc.face(gray=True)
+    >>> sx, sy = f.shape
     >>> X, Y = np.ogrid[0:sx, 0:sy]
-    >>> regions = sy/6 * (X/4) + Y/6  # note that we use broadcasting
-    >>> block_mean = ndimage.mean(l, labels=regions, index=np.arange(1,
+    >>> regions = (sy//6) * (X//4) + (Y//6)  # note that we use broadcasting
+    >>> block_mean = ndimage.mean(f, labels=regions, index=np.arange(1,
     ...     regions.max() +1))
-    >>> block_mean.shape = (sx/4, sy/6)
+    >>> block_mean.shape = (sx // 4, sy // 6)
 
-.. figure:: auto_examples/images/plot_block_mean_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_block_mean_001.png
     :scale: 70
     :target: auto_examples/plot_block_mean.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_block_mean.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_block_mean.py>`]
 
 When regions are regular blocks, it is more efficient to use stride
 tricks (:ref:`stride-manipulation-label`).
 
 Non-regularly-spaced blocks: radial mean::
 
-    >>> sx, sy = l.shape
+    >>> sx, sy = f.shape
     >>> X, Y = np.ogrid[0:sx, 0:sy]
     >>> r = np.hypot(X - sx/2, Y - sy/2)
     >>> rbin = (20* r/r.max()).astype(np.int)
-    >>> radial_mean = ndimage.mean(l, labels=rbin, index=np.arange(1, rbin.max() +1))
+    >>> radial_mean = ndimage.mean(f, labels=rbin, index=np.arange(1, rbin.max() +1))
 
-.. figure:: auto_examples/images/plot_radial_mean_1.png
+.. figure:: auto_examples/images/sphx_glr_plot_radial_mean_001.png
     :scale: 70
     :target: auto_examples/plot_radial_mean.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_radial_mean.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_radial_mean.py>`]
 
 
 * **Other measures**
 
 Correlation function, Fourier/wavelet spectrum, etc.
 
-One example with mathematical morphology: **granulometry**
-(http://en.wikipedia.org/wiki/Granulometry_%28morphology%29)
+One example with mathematical morphology: `granulometry
+<https://en.wikipedia.org/wiki/Granulometry_%28morphology%29>`_
 
 ::
 
@@ -866,7 +873,7 @@ One example with mathematical morphology: **granulometry**
     >>>
     >>> def granulometry(data, sizes=None):
     ...     s = max(data.shape)
-    ...     if sizes == None:
+    ...     if sizes is None:
     ...         sizes = range(1, s/2, 2)
     ...     granulo = [ndimage.binary_opening(data, \
     ...         structure=disk_structure(n)).sum() for n in sizes]
@@ -885,11 +892,37 @@ One example with mathematical morphology: **granulometry**
     >>>
     >>> granulo = granulometry(mask, sizes=np.arange(2, 19, 4))
 
-.. figure:: auto_examples/images/plot_granulo_1.png
+
+.. figure:: auto_examples/images/sphx_glr_plot_granulo_001.png
     :scale: 100
     :target: auto_examples/plot_granulo.html
 
 .. only:: html
 
-    [:ref:`Python source code <example_plot_granulo.py>`]
+    [:ref:`Python source code <sphx_glr_advanced_image_processing_auto_examples_plot_granulo.py>`]
+
+
+Full code examples
+==================
+
+.. include the gallery. Skip the first line to avoid the "orphan"
+   declaration
+
+.. include:: auto_examples/index.rst
+    :start-line: 1
+
+|
+
+
+.. seealso:: More on image-processing:
+
+   * The chapter on :ref:`Scikit-image <scikit_image>`
+   
+   * Other, more powerful and complete modules: `OpenCV
+     <https://opencv-python-tutroals.readthedocs.org/en/latest>`_
+     (Python bindings), `CellProfiler <http://www.cellprofiler.org>`_,
+     `ITK <http://www.itk.org/>`_ with Python bindings
+
+
+
 

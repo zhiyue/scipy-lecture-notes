@@ -1,3 +1,10 @@
+"""
+Watershed segmentation
+=======================
+
+This example shows how to do segmentation with watershed.
+"""
+
 import numpy as np
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
@@ -28,7 +35,7 @@ plt.subplot(132)
 plt.imshow(-distance, interpolation='nearest')
 plt.axis('off')
 plt.subplot(133)
-plt.imshow(labels, cmap='spectral', interpolation='nearest')
+plt.imshow(labels, cmap='nipy_spectral', interpolation='nearest')
 plt.axis('off')
 
 plt.subplots_adjust(hspace=0.01, wspace=0.01, top=1, bottom=0, left=0,

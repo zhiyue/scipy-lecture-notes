@@ -1,27 +1,29 @@
-import pylab as pl
+"""
+Plot and filled plots
+=====================
+
+Simple example of plots and filling between them with matplotlib.
+"""
+
 import numpy as np
+import matplotlib.pyplot as plt
 
 n = 256
-X = np.linspace(0, 2, n)
-Y = np.sin(2 * np.pi * X)
+X = np.linspace(-np.pi, np.pi, n)
+Y = np.sin(2 * X)
 
-pl.plot (X, Y, lw=2, color='violet')
-pl.xlim(-0.2, 2.2)
-pl.xticks(())
-pl.ylim(-1.2, 1.2)
-pl.yticks(())
+plt.axes([0.025, 0.025, 0.95, 0.95])
 
-pl.text(-0.05, 1.02, " Regular Plot:      pl.plot(...)\n",
-        horizontalalignment='left',
-        verticalalignment='top',
-        size='xx-large',
-        bbox=dict(facecolor='white', alpha=1.0, width=400, height=65),
-        transform=pl.gca().transAxes)
+plt.plot(X, Y + 1, color='blue', alpha=1.00)
+plt.fill_between(X, 1, Y + 1, color='blue', alpha=.25)
 
-pl.text(-0.05, 1.01, "\n\n   Plot lines and/or markers ",
-        horizontalalignment='left',
-        verticalalignment='top',
-        size='large',
-        transform=pl.gca().transAxes)
+plt.plot(X, Y - 1, color='blue', alpha=1.00)
+plt.fill_between(X, -1, Y - 1, (Y - 1) > -1, color='blue', alpha=.25)
+plt.fill_between(X, -1, Y - 1, (Y - 1) < -1, color='red',  alpha=.25)
 
-pl.show()
+plt.xlim(-np.pi, np.pi)
+plt.xticks([])
+plt.ylim(-2.5, 2.5)
+plt.yticks([])
+
+plt.show()

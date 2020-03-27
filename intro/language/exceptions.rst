@@ -1,14 +1,14 @@
 Exception handling in Python
 ============================
 
-It is highly unlikely that you haven't yet raised Exceptions if you have
+It is likely that you have raised Exceptions if you have
 typed all the previous commands of the tutorial. For example, you may
 have raised an exception if you entered a command with a typo.
 
 Exceptions are raised by different kinds of errors arising when executing
 Python code. In your own code, you may also catch errors, or define custom
 error types. You may want to look at the descriptions of the `the built-in
-Exceptions <http://docs.python.org/2/library/exceptions.html>`_ when looking
+Exceptions <https://docs.python.org/2/library/exceptions.html>`_ when looking
 for the right exception type.
 
 Exceptions
@@ -94,7 +94,7 @@ Easier to ask for forgiveness than for permission
        ....:     try:
        ....:         collection.sort()
        ....:     except AttributeError:
-       ....:         pass
+       ....:         pass # The pass statement does nothing
        ....:     print(collection)
        ....:
        ....:
@@ -119,7 +119,7 @@ Raising exceptions
     In [15]: def filter_name(name):
        ....:	try:
        ....:	    name = name.encode('ascii')
-       ....:	except UnicodeError, e:
+       ....:	except UnicodeError as e:
        ....:	    if name == 'Gaël':
        ....:		print('OK, Gaël')
        ....:	    else:

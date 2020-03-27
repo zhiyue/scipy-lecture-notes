@@ -1,17 +1,25 @@
-import pylab as pl
+"""
+Subplot plot arrangement vertical
+==================================
 
-pl.figure(figsize=(6, 4))
-pl.subplot(1, 2, 1)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(1,2,1)', ha='center', va='center',
+An example showing vertical arrangement of subplots with matplotlib.
+"""
+
+import matplotlib.pyplot as plt
+
+
+plt.figure(figsize=(6, 4))
+plt.subplot(1, 2, 1)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(1,2,1)', ha='center', va='center',
         size=24, alpha=.5)
 
-pl.subplot(1, 2, 2)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(1,2,2)', ha='center', va='center',
+plt.subplot(1, 2, 2)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(1,2,2)', ha='center', va='center',
         size=24, alpha=.5)
 
-pl.tight_layout()
-pl.show()
+plt.tight_layout()
+plt.show()

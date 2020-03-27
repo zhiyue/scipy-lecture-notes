@@ -1,15 +1,19 @@
+.. _python_language_chapter:
+
 The Python language
 =====================================
 
-:authors: Chris Burns, Christophe Combelles, Emmanuelle Gouillart, Gaël Varoquaux
+**Authors**: *Chris Burns, Christophe Combelles, Emmanuelle Gouillart,
+Gaël Varoquaux*
 
 .. topic:: Python for scientific computing
 
     We introduce here the Python language. Only the bare minimum
     necessary for getting started with Numpy and Scipy is addressed here.
     To learn more about the language, consider going through the
-    excellent tutorial http://docs.python.org/tutorial. Dedicated books
-    are also available, such as http://diveintopython.net/.
+    excellent tutorial https://docs.python.org/tutorial. Dedicated books
+    are also available, such as `Dive into Python 3 <https://diveintopython3.net/>`__.
+    
 
 .. image:: python-logo.png
    :align: right
@@ -48,7 +52,7 @@ The Python language
     course of a program).
 
 
-  See http://www.python.org/about/ for more information about
+  See https://www.python.org/about/ for more information about
   distinguishing features of Python.
 
 _____

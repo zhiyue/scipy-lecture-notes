@@ -1,3 +1,5 @@
+.. _optimizing_code_chapter:
+
 =================
 Optimizing code
 =================
@@ -6,15 +8,13 @@ Optimizing code
 
    *“Premature optimization is the root of all evil”*
 
-:author: Gaël Varoquaux
+**Author**: *Gaël Varoquaux*
 
 This chapter deals with strategies to make Python code go faster.
 
 .. topic:: Prerequisites
 
     * `line_profiler <http://packages.python.org/line_profiler/>`_
-    * `gprof2dot <http://code.google.com/p/jrfonseca/wiki/Gprof2Dot>`_
-    * `dot utility from Graphviz <http://www.graphviz.org/>`_
 
 .. contents:: Chapters contents
    :local:
@@ -52,7 +52,7 @@ Profiling Python code
 Timeit
 ---------
 
-In IPython, use ``timeit`` (http://docs.python.org/library/timeit.html) to time elementary operations:
+In IPython, use ``timeit`` (https://docs.python.org/library/timeit.html) to time elementary operations:
 
 .. sourcecode:: ipython
 
@@ -88,12 +88,12 @@ Useful when you have a large program to profile, for example the
 .. note::
     This is a combination of two unsupervised learning techniques, principal
     component analysis (`PCA
-    <http://en.wikipedia.org/wiki/Principal_component_analysis>`_) and
+    <httsp://en.wikipedia.org/wiki/Principal_component_analysis>`_) and
     independent component analysis
-    (`ICA<http://en.wikipedia.org/wiki/Independent_component_ana lysis>`_). PCA
+    (`ICA <https://en.wikipedia.org/wiki/Independent_component_analysis>`_). PCA
     is a technique for dimensionality reduction, i.e. an algorithm to explain
     the observed variance in your data using less dimensions. ICA is a source
-    seperation technique, for example to unmix multiple signals that have been
+    separation technique, for example to unmix multiple signals that have been
     recorded through multiple sensors. Doing a PCA first and then an ICA can be
     useful if you have more sensors than signals. For more information see:
     `the FastICA example from scikits-learn <http://scikit-learn.org/stable/auto_examples/decomposition/plot_ica_blind_source_separation.html>`_.
@@ -119,30 +119,30 @@ and profile it:
 
    Ordered by: internal time
 
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1   14.457   14.457   14.479   14.479 decomp.py:849(svd)
+   ncalls  tottime  percall  cumtime  percall filename:lineno (function)
+        1   14.457   14.457   14.479   14.479 decomp.py:849 (svd)
         1    0.054    0.054    0.054    0.054 {method 'random_sample' of 'mtrand.RandomState' objects}
-        1    0.017    0.017    0.021    0.021 function_base.py:645(asarray_chkfinite)
+        1    0.017    0.017    0.021    0.021 function_base.py:645 (asarray_chkfinite)
        54    0.011    0.000    0.011    0.000 {numpy.core._dotblas.dot}
         2    0.005    0.002    0.005    0.002 {method 'any' of 'numpy.ndarray' objects}
-        6    0.001    0.000    0.001    0.000 ica.py:195(gprime)
-        6    0.001    0.000    0.001    0.000 ica.py:192(g)
+        6    0.001    0.000    0.001    0.000 ica.py:195 (gprime)
+        6    0.001    0.000    0.001    0.000 ica.py:192 (g)
        14    0.001    0.000    0.001    0.000 {numpy.linalg.lapack_lite.dsyevd}
-       19    0.001    0.000    0.001    0.000 twodim_base.py:204(diag)
-        1    0.001    0.001    0.008    0.008 ica.py:69(_ica_par)
+       19    0.001    0.000    0.001    0.000 twodim_base.py:204 (diag)
+        1    0.001    0.001    0.008    0.008 ica.py:69 (_ica_par)
         1    0.001    0.001   14.551   14.551 {execfile}
-      107    0.000    0.000    0.001    0.000 defmatrix.py:239(__array_finalize__)
-        7    0.000    0.000    0.004    0.001 ica.py:58(_sym_decorrelation)
-        7    0.000    0.000    0.002    0.000 linalg.py:841(eigh)
+      107    0.000    0.000    0.001    0.000 defmatrix.py:239 (__array_finalize__)
+        7    0.000    0.000    0.004    0.001 ica.py:58 (_sym_decorrelation)
+        7    0.000    0.000    0.002    0.000 linalg.py:841 (eigh)
       172    0.000    0.000    0.000    0.000 {isinstance}
-        1    0.000    0.000   14.551   14.551 demo.py:1(<module>)
-       29    0.000    0.000    0.000    0.000 numeric.py:180(asarray)
-       35    0.000    0.000    0.000    0.000 defmatrix.py:193(__new__)
-       35    0.000    0.000    0.001    0.000 defmatrix.py:43(asmatrix)
-       21    0.000    0.000    0.001    0.000 defmatrix.py:287(__mul__)
+        1    0.000    0.000   14.551   14.551 demo.py:1 (<module>)
+       29    0.000    0.000    0.000    0.000 numeric.py:180 (asarray)
+       35    0.000    0.000    0.000    0.000 defmatrix.py:193 (__new__)
+       35    0.000    0.000    0.001    0.000 defmatrix.py:43 (asmatrix)
+       21    0.000    0.000    0.001    0.000 defmatrix.py:287 (__mul__)
        41    0.000    0.000    0.000    0.000 {numpy.core.multiarray.zeros}
        28    0.000    0.000    0.000    0.000 {method 'transpose' of 'numpy.ndarray' objects}
-        1    0.000    0.000    0.008    0.008 ica.py:97(fastica)
+        1    0.000    0.000    0.008    0.008 ica.py:97 (fastica)
         ...
 
 Clearly the ``svd`` (in `decomp.py`) is what takes most of our time, a.k.a. the
@@ -150,11 +150,27 @@ bottleneck. We have to find a way to make this step go faster, or to avoid this
 step (algorithmic optimization). Spending time on the rest of the code is
 useless.
 
+.. topic:: **Profiling outside of IPython, running ``cProfile``**
+
+    Similar profiling can be done outside of IPython, simply calling the
+    built-in `Python profilers
+    <https://docs.python.org/2/library/profile.html>`_ ``cProfile`` and
+    ``profile``.
+
+    .. sourcecode:: console
+
+        $  python -m cProfile -o demo.prof demo.py
+
+    Using the ``-o`` switch will output the profiler results to the file
+    ``demo.prof`` to view with an external tool. This can be useful if
+    you wish to process the profiler output with a visualization tool.
+
+
 Line-profiler
 --------------
 
-The profiler is great: it tells us which function takes most of the time,
-but not where it is called.
+The profiler tells us which function takes most of the time, but not
+where it is called.
 
 For this, we use the
 `line_profiler <http://packages.python.org/line_profiler/>`_: in the
@@ -167,11 +183,11 @@ source file, we decorate a few functions that we want to inspect with
     def test():
         data = np.random.random((5000, 100))
         u, s, v = linalg.svd(data)
-        pca = np.dot(u[: , :10], data)
+        pca = np.dot(u[:, :10], data)
         results = fastica(pca.T, whiten=False)
 
 Then we run the script using the `kernprof.py
-<http://packages.python.org/line_profiler/kernprof.py>`_ program, with switches ``-l, --line-by-line`` and ``-v, --view`` to use the line-by-line profiler and view the results in addition to saving them:
+<http://packages.python.org/line_profiler>`_ program, with switches ``-l, --line-by-line`` and ``-v, --view`` to use the line-by-line profiler and view the results in addition to saving them:
 
 .. sourcecode:: console
 
@@ -185,7 +201,7 @@ Then we run the script using the `kernprof.py
     Total time: 14.2793 s
 
     Line #      Hits         Time  Per Hit   % Time  Line Contents
-    ==============================================================
+    =========== ============ ===== ========= ======= ==== ========
         5                                           @profile
         6                                           def test():
         7         1        19015  19015.0      0.1      data = np.random.random((5000, 100))
@@ -195,36 +211,6 @@ Then we run the script using the `kernprof.py
 
 **The SVD is taking all the time.** We need to optimise this line.
 
-Running ``cProfile``
---------------------
-
-In the IPython example above, IPython simply calls the built-in `Python
-profilers <http://docs.python.org/2/library/profile.html>`_ ``cProfile`` and
-``profile``. This can be useful if you wish to process the profiler output with a
-visualization tool.
-
-.. sourcecode:: console
-
-   $  python -m cProfile -o demo.prof demo.py
-
-Using the ``-o`` switch will output the profiler results to the file
-``demo.prof``.
-
-Using ``gprof2dot``
--------------------
-
-In case you want a more visual representation of the profiler output, you can
-use the `gprof2dot <http://code.google.com/p/jrfonseca/wiki/Gprof2Dot>`_ tool:
-
-.. sourcecode:: console
-
-    $ gprof2dot -f pstats demo.prof | dot -Tpng -o demo-prof.png
-
-Which will produce the following picture:
-
-.. image:: demo-prof.png
-
-Which again paints a similar picture as the previous approaches.
 
 Making code go faster
 ======================
@@ -247,7 +233,7 @@ Example of the SVD
 ...................
 
 In both examples above, the SVD -
-`Singular Value Decomposition <http://en.wikipedia.org/wiki/Singular_value_decomposition>`_
+`Singular Value Decomposition <https://en.wikipedia.org/wiki/Singular_value_decomposition>`_
 - is what
 takes most of the time. Indeed, the computational cost of this algorithm is
 roughly :math:`n^3` in the size of the input matrix.
@@ -277,8 +263,7 @@ scipy are richer then those in numpy and should be preferred.
 We can then use this insight to :download:`optimize the previous code <demo_opt.py>`:
 
 .. literalinclude:: demo_opt.py
-   :start-line: 9
-   :end-line: 13
+   :pyobject: test
 
 .. sourcecode:: ipython
 
@@ -320,7 +305,8 @@ Writing faster numerical code
 A complete discussion on advanced use of numpy is found in chapter
 :ref:`advanced_numpy`, or in the article `The NumPy array: a structure
 for efficient numerical computation
-<http://hal.inria.fr/inria-00564007/en>`_ by van der Walt et al. Here we
+<https://hal.inria.fr/inria-00564007/en>`_
+by van der Walt et al. Here we
 discuss only some commonly encountered tricks to make code faster.
 
 * **Vectorizing for loops**
@@ -433,15 +419,16 @@ Additional Links
 ----------------
 
 * If you need to profile memory usage, you could try the `memory_profiler
-  <http://pypi.python.org/pypi/memory_profiler>`_
+  <https://pypi.python.org/pypi/memory_profiler>`_
 
 * If you need to profile down into C extensions, you could try using
-  `gperftools <http://code.google.com/p/gperftools/?redir=1>`_ from Python with
-  `yep <http://pypi.python.org/pypi/yep>`_.
+  `gperftools <https://github.com/gperftools/gperftools>`_
+  from Python with
+  `yep <https://pypi.python.org/pypi/yep>`_.
 
 * If you would like to track performace of your code across time, i.e. as you
   make new commits to your repository, you could try:
-  `vbench <https://github.com/pydata/vbench>`_
+  `asv <https://asv.readthedocs.io/>`_
 
 * If you need some interactive visualization why not try `RunSnakeRun
   <http://www.vrplumber.com/programming/runsnakerun/>`_

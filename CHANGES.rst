@@ -1,7 +1,145 @@
 What's new
 ==========
 
-Release 2013.2 beta (21 August 2013)
+Release 2020.1 (March 2020)
+-----------------------------
+
+* Fix outdated URLs (Gert-Ludwig Ingold)
+
+* Update packages (Pierre de Buyl)
+
+* Remove Python 2 continous integration (Olav Vahtras - EuroSciPy 2019 sprint)
+
+* Fix chessboard size (Mark Setchell)
+
+* Add objectives and design choices (Gert-Ludwig Ingold and Pierre de Buyl)
+
+* Make the numpy advanced iterator example more elaborate (Sebastian Berg)
+
+* Use empty list instead of empty tuple to deactivate ticks (Tim Hoffmann)
+
+* Fix typos (Sander van Rijn, cydave, Michel Corne) and off by 2 errors
+  (Andreas Hilboll)
+
+* Improve readability of Polynomials example code (Michel Corne)
+
+* Replace suggestions for debugging environments (Gert-Ludwig Ingold)
+
+* Add section on Python 2 vs Python 3 (Pierre de Buyl)
+
+
+Release 2019.1 (May 2019)
+-------------------------
+
+* Update matplotlib compatibility to version 2.2 (Mike Mueller, Joris Van den
+  Bossche, Pierre de Buyl)
+
+* Make C-API example cos_module_np Python 2/3 compatible (Michael Boyle)
+
+* Fix typos and outdated URLs (Dogacan Dugmeci, Matthieu Boileau, Stuart Geiger, Omar
+  Gutiérrez, Himanshu, Julian Hofer, Joseph Salmon, Manuel López-Ibáñez,
+  Nicola Masarone, michelemaroni89, Evgeny Pogrebnyak, tommyod)
+
+
+Release 2018.1 (September 2018)
+-------------------------------------
+
+* Fix wordings, typos, colours (Pierre de Buyl, Greg Kiar, Olav Vahtras
+  Kristian Rother)
+
+* Fix interpolation example code (Scott Staniewicz)
+
+* Fix CSS for high density displays (Gaël Varoquaux)
+
+* Generate indexing figures with PyX (Gert Ingold)
+
+* Warn clearly against the use of Python 2 (Bruno Hanzen)
+
+* Update external links (Bruno Hanzen)
+
+* Update versions of dependencies: sphinx-gallery, pandas, statsmodels
+  (Gaël Varoquaux)
+
+
+Release 2017.1 (October 2017)
+-------------------------------------
+
+* Update optimization chapter (Michael Hartmann, Gaël Varoquaux)
+
+* Update SymPy chapter (Vince Knight)
+
+* Update advanced NumPy (Bartosz Teleńczuk)
+
+* Update scikit-learn chapter (Gaël Varoquaux)
+
+* Update SciPy chapter (Gaël Varoquaux)
+
+* Make '>>>' in the prompts unselectable (Pierre de Buyl)
+
+* Use common package requirements for pip and conda and improve the build
+  instructions (Gert-Ludwig Ingold, Vince Knight, Pierre de Buyl)
+
+* Set up Circle CI (Loïc Estève)
+
+* Improved support for Python 3 integer divisions and calls to print (Loïc
+  Estève, Gert-Ludwig Ingold, Pierre de Buyl, Gaël Varoquaux)
+
+* Change test runner to pytest (Pierre de Buyl)
+
+* Replace the plot directive by sphinx-gallery (Gert-Ludwig Ingold)
+
+Release 2016.1 (September 2016)
+-------------------------------------
+
+* Rework of intro chapter (Gaël Varoquaux)
+
+* Integrate sphinx-gallery: examples are now Jupyter notebooks (Gaël
+  Varoquaux, Gert-Ludwig Ingold, Óscar Nájera)
+
+* Better Python 3 tests and support (Gert-Ludwig Ingold)
+
+* Adapt examples to Matplotlib 1.5 (Gaël Varoquaux)
+
+* Modernize numpy chapter (Bartosz Telenczuk)
+
+Release 2015.3 (November 2015)
+-------------------------------------
+
+* Collapsed sidebar can now pop up for mid-sized display (Gaël Varoquaux)
+
+* Replaced pictures of Lena by racoon face (Thouis Jones)
+
+Release 2015.2 (October 2015)
+-------------------------------------
+
+* Authors on cover ordered as in bibtex entry (Nicolas Rougier)
+
+* Better rendering on mobile (Gaël Varoquaux)
+
+* Fix restructured text markup errors (Olav Vahtras)
+
+Release 2015.1 (September 2015)
+-------------------------------------
+
+* New chapter on statistics with Python (Gaël Varoquaux)
+
+* Better layout in PDF (Gaël Varoquaux)
+
+* New HTML layout, simplified formatting, mobile-friendly and sidebar
+  (Gaël Varoquaux, Nelle Varoquaux)
+
+* Logos on the HTML front page and on the PDF cover (Nicolas Rougier)
+
+* Python 3 compatible code (Gaël Varoquaux, Olav Vahtras)
+
+* Code put up to date for more recent versions of project (Pierre de
+  Buyl, Emmanuelle Gouillart, Gert-Ludwig Ingold, Nicolas Pettiaux, Olav
+  Vahtras, Gaël Varoquaux, Nelle Varoquaux)
+
+* Matplotlib updated with removal of deprecated pylab interface (Nicolas
+  Rougier)
+
+Release 2013.2 (21 August 2013)
 -------------------------------------
 
 * Numpy chapter simplified (Valentin Haenel)

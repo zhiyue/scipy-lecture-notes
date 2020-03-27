@@ -1,66 +1,75 @@
-The submodule dedicated to image processing in scipy is :mod:`scipy.ndimage`. ::
+:orphan:
 
-    >>> from scipy import ndimage
+.. for doctests
+   >>> import matplotlib.pyplot as plt
+   >>> plt.switch_backend("Agg")
 
-Image processing routines may be sorted according to the category of
-processing they perform.
-
+:mod:`scipy.ndimage` provides manipulation of n-dimensional arrays as
+images.
 
 Geometrical transformations on images
 .......................................
 
 Changing orientation, resolution, .. ::
 
-    >>> from scipy import misc
-    >>> lena = misc.lena()
-    >>> shifted_lena = ndimage.shift(lena, (50, 50))
-    >>> shifted_lena2 = ndimage.shift(lena, (50, 50), mode='nearest')
-    >>> rotated_lena = ndimage.rotate(lena, 30)
-    >>> cropped_lena = lena[50:-50, 50:-50]
-    >>> zoomed_lena = ndimage.zoom(lena, 2)
-    >>> zoomed_lena.shape
-    (1024, 1024)
+    >>> from scipy import misc  # Load an image
+    >>> face = misc.face(gray=True)
 
-.. figure:: image_processing/lena_transforms.png
-   :align: center
-   :scale: 70
+    >>> from scipy import ndimage # Shift, roate and zoom it
+    >>> shifted_face = ndimage.shift(face, (50, 50))
+    >>> shifted_face2 = ndimage.shift(face, (50, 50), mode='nearest')
+    >>> rotated_face = ndimage.rotate(face, 30)
+    >>> cropped_face = face[50:-50, 50:-50]
+    >>> zoomed_face = ndimage.zoom(face, 2)
+    >>> zoomed_face.shape
+    (1536, 2048)
+
+.. image:: scipy/auto_examples/images/sphx_glr_plot_image_transform_001.png
+    :target: scipy/auto_examples/plot_image_transform.html
+    :scale: 70
+    :align: center
 
 
-.. sourcecode:: ipython
+::
 
-    In [35]: subplot(151)
-    Out[35]: <matplotlib.axes.AxesSubplot object at 0x925f46c>
+    >>> plt.subplot(151)    # doctest: +ELLIPSIS
+    <matplotlib.axes._subplots.AxesSubplot object at 0x...>
 
-    In [36]: pl.imshow(shifted_lena, cmap=cm.gray)
-    Out[36]: <matplotlib.image.AxesImage object at 0x9593f6c>
+    >>> plt.imshow(shifted_face, cmap=plt.cm.gray)    # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
 
-    In [37]: axis('off')
-    Out[37]: (-0.5, 511.5, 511.5, -0.5)
+    >>> plt.axis('off')
+    (-0.5, 1023.5, 767.5, -0.5)
 
-    In [39]: # etc.
+    >>> # etc.
 
 
 Image filtering
 ...................
 
-::
+Generate a noisy face::
 
     >>> from scipy import misc
-    >>> lena = misc.lena()
+    >>> face = misc.face(gray=True)
+    >>> face = face[:512, -512:]  # crop out square on right
     >>> import numpy as np
-    >>> noisy_lena = np.copy(lena).astype(np.float)
-    >>> noisy_lena += lena.std()*0.5*np.random.standard_normal(lena.shape)
-    >>> blurred_lena = ndimage.gaussian_filter(noisy_lena, sigma=3)
-    >>> median_lena = ndimage.median_filter(blurred_lena, size=5)
+    >>> noisy_face = np.copy(face).astype(np.float)
+    >>> noisy_face += face.std() * 0.5 * np.random.standard_normal(face.shape)
+
+Apply a variety of filters on it::
+
+    >>> blurred_face = ndimage.gaussian_filter(noisy_face, sigma=3)
+    >>> median_face = ndimage.median_filter(noisy_face, size=5)
     >>> from scipy import signal
-    >>> wiener_lena = signal.wiener(blurred_lena, (5,5))
+    >>> wiener_face = signal.wiener(noisy_face, (5, 5))
 
-.. figure:: image_processing/filtered_lena.png
-   :align: center
-   :scale: 80
+.. image:: scipy/auto_examples/images/sphx_glr_plot_image_filters_001.png
+    :target: scipy/auto_examples/plot_image_filters.html
+    :scale: 70
+    :align: center
 
 
-Many other filters in :mod:`scipy.ndimage.filters` and :mod:`scipy.signal`
+Other filters in :mod:`scipy.ndimage.filters` and :mod:`scipy.signal`
 can be applied to images.
 
 .. topic:: Exercise
@@ -71,33 +80,37 @@ can be applied to images.
 Mathematical morphology
 ........................
 
-Mathematical morphology is a mathematical theory that stems from set
-theory. It characterizes and transforms geometrical structures. Binary
-(black and white) images, in particular, can be transformed using this
-theory: the sets to be transformed are the sets of neighboring
-non-zero-valued pixels. The theory was also extended to gray-valued images.
+.. tip::
+
+    `Mathematical morphology
+    <https://en.wikipedia.org/wiki/Mathematical_morphology>`_ stems from set
+    theory. It characterizes and transforms geometrical structures. Binary
+    (black and white) images, in particular, can be transformed using this
+    theory: the sets to be transformed are the sets of neighboring
+    non-zero-valued pixels. The theory was also extended to gray-valued
+    images.
 
 .. image:: image_processing/morpho_mat.png
    :align: center
 
-Elementary mathematical-morphology operations use a *structuring element*
-in order to modify other geometrical structures.
+Mathematical-morphology operations use a *structuring element*
+in order to modify geometrical structures.
 
-Let us first generate a structuring element ::
+Let us first generate a structuring element::
 
     >>> el = ndimage.generate_binary_structure(2, 1)
-    >>> el
+    >>> el # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
     array([[False, True, False],
-           [True, True, True],
-           [False, True, False]], dtype=bool)
+           [...True, True, True],
+           [False, True, False]])
     >>> el.astype(np.int)
     array([[0, 1, 0],
            [1, 1, 1],
            [0, 1, 0]])
 
-* **Erosion** ::
+* **Erosion** :func:`scipy.ndimage.binary_erosion` ::
 
-    >>> a = np.zeros((7,7), dtype=np.int)
+    >>> a = np.zeros((7, 7), dtype=np.int)
     >>> a[1:6, 2:5] = 1
     >>> a
     array([[0, 0, 0, 0, 0, 0, 0],
@@ -125,27 +138,28 @@ Let us first generate a structuring element ::
            [0, 0, 0, 0, 0, 0, 0],
            [0, 0, 0, 0, 0, 0, 0]])
 
-* **Dilation** ::
+* **Dilation** :func:`scipy.ndimage.binary_dilation`  ::
 
     >>> a = np.zeros((5, 5))
     >>> a[2, 2] = 1
     >>> a
-    array([[ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
     >>> ndimage.binary_dilation(a).astype(a.dtype)
-    array([[ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  1.,  1.,  1.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  1.,  1.,  1.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
 
-* **Opening** ::
+* **Opening** :func:`scipy.ndimage.binary_opening` ::
 
-    >>> a = np.zeros((5,5), dtype=np.int)
-    >>> a[1:4, 1:4] = 1; a[4, 4] = 1
+    >>> a = np.zeros((5, 5), dtype=np.int)
+    >>> a[1:4, 1:4] = 1
+    >>> a[4, 4] = 1
     >>> a
     array([[0, 0, 0, 0, 0],
            [0, 1, 1, 1, 0],
@@ -153,7 +167,7 @@ Let us first generate a structuring element ::
            [0, 1, 1, 1, 0],
            [0, 0, 0, 0, 1]])
     >>> # Opening removes small objects
-    >>> ndimage.binary_opening(a, structure=np.ones((3,3))).astype(np.int)
+    >>> ndimage.binary_opening(a, structure=np.ones((3, 3))).astype(np.int)
     array([[0, 0, 0, 0, 0],
            [0, 1, 1, 1, 0],
            [0, 1, 1, 1, 0],
@@ -167,7 +181,7 @@ Let us first generate a structuring element ::
            [0, 0, 1, 0, 0],
            [0, 0, 0, 0, 0]])
 
-* **Closing:** ``ndimage.binary_closing``
+* **Closing:** :func:`scipy.ndimage.binary_closing`
 
 .. topic:: Exercise
    :class: green
@@ -180,14 +194,16 @@ image. ::
 
     >>> a = np.zeros((50, 50))
     >>> a[10:-10, 10:-10] = 1
-    >>> a += 0.25*np.random.standard_normal(a.shape)
+    >>> a += 0.25 * np.random.standard_normal(a.shape)
     >>> mask = a>=0.5
     >>> opened_mask = ndimage.binary_opening(mask)
     >>> closed_mask = ndimage.binary_closing(opened_mask)
 
-.. figure:: image_processing/morpho.png
-   :align: center
-   :scale: 75
+.. image:: scipy/auto_examples/images/sphx_glr_plot_mathematical_morpho_001.png
+    :target: scipy/auto_examples/plot_mathematical_morpho.html
+    :scale: 70
+    :align: center
+
 
 .. topic:: Exercise
    :class: green
@@ -200,9 +216,9 @@ For *gray-valued* images, eroding (resp. dilating) amounts to replacing
 a pixel by the minimal (resp. maximal) value among pixels covered by the
 structuring element centered on the pixel of interest. ::
 
-    >>> a = np.zeros((7,7), dtype=np.int)
+    >>> a = np.zeros((7, 7), dtype=np.int)
     >>> a[1:6, 1:6] = 3
-    >>> a[4,4] = 2; a[2,3] = 1
+    >>> a[4, 4] = 2; a[2, 3] = 1
     >>> a
     array([[0, 0, 0, 0, 0, 0, 0],
            [0, 3, 3, 3, 3, 3, 0],
@@ -211,7 +227,7 @@ structuring element centered on the pixel of interest. ::
            [0, 3, 3, 3, 2, 3, 0],
            [0, 3, 3, 3, 3, 3, 0],
            [0, 0, 0, 0, 0, 0, 0]])
-    >>> ndimage.grey_erosion(a, size=(3,3))
+    >>> ndimage.grey_erosion(a, size=(3, 3))
     array([[0, 0, 0, 0, 0, 0, 0],
            [0, 0, 0, 0, 0, 0, 0],
            [0, 0, 1, 1, 1, 0, 0],
@@ -221,38 +237,62 @@ structuring element centered on the pixel of interest. ::
            [0, 0, 0, 0, 0, 0, 0]])
 
 
-Measurements on images
-........................
+Connected components and measurements on images
+................................................
 
 Let us first generate a nice synthetic binary image. ::
 
     >>> x, y = np.indices((100, 100))
-    >>> sig = np.sin(2*np.pi*x/50.)*np.sin(2*np.pi*y/50.)*(1+x*y/50.**2)**2
+    >>> sig = np.sin(2*np.pi*x/50.) * np.sin(2*np.pi*y/50.) * (1+x*y/50.**2)**2
     >>> mask = sig > 1
 
-Now we look for various information about the objects in the image::
+.. image:: scipy/auto_examples/images/sphx_glr_plot_connect_measurements_001.png
+    :target: scipy/auto_examples/plot_connect_measurements.html
+    :scale: 60
+    :align: center
+
+.. image:: scipy/auto_examples/images/sphx_glr_plot_connect_measurements_002.png
+    :target: scipy/auto_examples/plot_connect_measurements.html
+    :scale: 60
+    :align: right
+
+:func:`scipy.ndimage.label` assigns a different label to each connected
+component::
 
     >>> labels, nb = ndimage.label(mask)
     >>> nb
     8
-    >>> areas = ndimage.sum(mask, labels, xrange(1, labels.max()+1))
-    >>> areas
-    array([ 190.,   45.,  424.,  278.,  459.,  190.,  549.,  424.])
-    >>> maxima = ndimage.maximum(sig, labels, xrange(1, labels.max()+1))
-    >>> maxima
-    array([  1.80238238,   1.13527605,   5.51954079,   2.49611818,
-             6.71673619,   1.80238238,  16.76547217,   5.51954079])
-    >>> ndimage.find_objects(labels==4)
+
+.. raw:: html
+
+   <div style="clear: both"></div>
+
+
+Now compute measurements on each connected component::
+
+    >>> areas = ndimage.sum(mask, labels, range(1, labels.max()+1))
+    >>> areas   # The number of pixels in each connected component
+    array([190.,   45.,  424.,  278.,  459.,  190.,  549.,  424.])
+    >>> maxima = ndimage.maximum(sig, labels, range(1, labels.max()+1))
+    >>> maxima  # The maximum signal in each connected component
+    array([ 1.80238238,   1.13527605,   5.51954079,   2.49611818, 6.71673619,
+            1.80238238,  16.76547217,   5.51954079])
+
+.. image:: scipy/auto_examples/images/sphx_glr_plot_connect_measurements_003.png
+    :target: scipy/auto_examples/plot_connect_measurements.html
+    :scale: 60
+    :align: right
+
+
+Extract the 4th connected component, and crop the array around it::
+
+    >>> ndimage.find_objects(labels==4) # doctest: +SKIP
     [(slice(30L, 48L, None), slice(30L, 48L, None))]
     >>> sl = ndimage.find_objects(labels==4)
-    >>> import pylab as pl
-    >>> pl.imshow(sig[sl[0]])   # doctest: +ELLIPSIS
+    >>> from matplotlib import pyplot as plt
+    >>> plt.imshow(sig[sl[0]])   # doctest: +ELLIPSIS
     <matplotlib.image.AxesImage object at ...>
 
-
-.. figure:: image_processing/measures.png
-   :align: center
-   :scale: 80
 
 
 See the summary exercise on :ref:`summary_exercise_image_processing` for a more

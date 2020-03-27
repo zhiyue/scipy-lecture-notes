@@ -1,3 +1,11 @@
+.. For doctests
+   >>> import numpy as np
+   >>> np.random.seed(0)
+   >>> # For doctest on headless environments
+   >>> from matplotlib import pyplot as plt
+  >>> import matplotlib.pyplot as plt
+  >>> plt.switch_backend("Agg")
+
 Introduction
 ============
 
@@ -24,9 +32,9 @@ Why Sparse Matrices?
     >>> plt.plot(x, 8.0 * (x**2) / 1e6, lw=5)    # doctest: +ELLIPSIS
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.xlabel('size n')    # doctest: +ELLIPSIS
-    <matplotlib.text.Text object at ...>
+    Text(...'size n')
     >>> plt.ylabel('memory [MB]')    # doctest: +ELLIPSIS
-    <matplotlib.text.Text object at ...>
+    Text(...'memory [MB]')
 
 Sparse Matrices vs. Sparse Matrix Storage Schemes
 -------------------------------------------------
@@ -45,17 +53,19 @@ Typical Applications
     * mechanical engineering, electrotechnics, physics, ...
 * graph theory
     * nonzero at `(i, j)` means that node `i` is connected to node `j`
+* natural language processing
+    * nonzero at `(i, j)` means that the document `i` contains the word `j`
 * ...
 
 Prerequisites
 -------------
 
-recent versions of
-
-* ``numpy``
-* ``scipy``
-* ``matplotlib`` (optional)
-* ``ipython`` (the enhancements come handy)
+.. rst-class:: horizontal
+  
+    * :ref:`numpy <numpy>`
+    * :ref:`scipy <scipy>`
+    * :ref:`matplotlib (optional) <matplotlib>`
+    * :ref:`ipython (the enhancements come handy) <interactive_work>`
 
 Sparsity Structure Visualization
 --------------------------------

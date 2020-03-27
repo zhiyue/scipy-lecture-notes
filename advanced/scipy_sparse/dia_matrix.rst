@@ -41,8 +41,8 @@ Examples
            [1, 2, 3, 4]])
     >>> offsets = np.array([0, -1, 2])
     >>> mtx = sparse.dia_matrix((data, offsets), shape=(4, 4))
-    >>> mtx   # doctest: +NORMALIZE_WHITESPACE
-    <4x4 sparse matrix of type '<type 'numpy.int64'>'
+    >>> mtx   # doctest: +NORMALIZE_WHITESPACE  +ELLIPSIS
+    <4x4 sparse matrix of type '<... 'numpy.int64'>'
             with 9 stored elements (3 diagonals) in DIAgonal format>
     >>> mtx.todense()
     matrix([[1, 0, 3, 0],
@@ -56,13 +56,13 @@ Examples
            [ 5,  6,  7,  8],
            [ 9, 10, 11, 12]])
     >>> mtx = sparse.dia_matrix((data, offsets), shape=(4, 4))
-    >>> mtx.data
+    >>> mtx.data        # doctest: +ELLIPSIS
     array([[ 1,  2,  3,  4],
            [ 5,  6,  7,  8],
            [ 9, 10, 11, 12]])
     >>> mtx.offsets
     array([ 0, -1,  2], dtype=int32)
-    >>> print mtx   # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mtx)   # doctest: +NORMALIZE_WHITESPACE
       (0, 0)        1
       (1, 1)        2
       (2, 2)        3
@@ -94,14 +94,14 @@ Examples
 
     >>> vec = np.ones((4, ))
     >>> vec
-    array([ 1.,  1.,  1.,  1.])
+    array([1.,  1.,  1.,  1.])
     >>> mtx * vec
-    array([ 12.,  19.,   9.,  11.])
+    array([12.,  19.,   9.,  11.])
     >>> mtx.toarray() * vec
-    array([[  1.,   0.,  11.,   0.],
-           [  5.,   2.,   0.,  12.],
-           [  0.,   6.,   3.,   0.],
-           [  0.,   0.,   7.,   4.]])
+    array([[ 1.,   0.,  11.,   0.],
+           [ 5.,   2.,   0.,  12.],
+           [ 0.,   6.,   3.,   0.],
+           [ 0.,   0.,   7.,   4.]])
 
 
 

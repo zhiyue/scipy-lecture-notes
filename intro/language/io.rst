@@ -8,11 +8,10 @@ Python. Since we will use the Numpy methods to read and write files,
 We write or read **strings** to/from files (other types must be converted to
 strings). To write in a file::
 
-
     >>> f = open('workfile', 'w') # opens the workfile file
-    >>> type(f)
+    >>> type(f)    # doctest: +SKIP 
     <type 'file'>
-    >>> f.write('This is a test \nand another test')
+    >>> f.write('This is a test \nand another test')   # doctest: +SKIP 
     >>> f.close()
 
 To read from a file
@@ -30,7 +29,9 @@ To read from a file
     In [4]: f.close()
 
 
-For more details: http://docs.python.org/tutorial/inputoutput.html
+.. seealso::
+   
+   For more details: https://docs.python.org/tutorial/inputoutput.html
 
 Iterating over a file
 ~~~~~~~~~~~~~~~~~~~~~
@@ -40,7 +41,7 @@ Iterating over a file
     In [6]: f = open('workfile', 'r')
 
     In [7]: for line in f:
-       ...:     print line
+       ...:     print(line)
        ...:
     This is a test 
 

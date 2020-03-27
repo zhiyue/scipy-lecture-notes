@@ -2,18 +2,19 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
-PAPER         = a4
 PYTHON        = python
+SPHINXOPTS    =
+SPHINXBUILD   = $(PYTHON) -m sphinx
 
-# Internal variables.
-PAPEROPT_a4     = -D latex_paper_size=a4
-PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d build/doctrees $(SPHINXOPTS) .
 
+SSH_HOST=
+SSH_USER=
+SSH_TARGET_DIR=
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck zip
+.PHONY: help clean html web pickle htmlhelp latex changes linkcheck zip check-rsync-env
+
+all: html-noplot
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -29,15 +30,30 @@ help:
 
 clean:
 	-rm -rf build/*
+	-rm -rf intro/scipy/auto_examples/ intro/matplotlib/auto_examples/ intro/summary-exercises/auto_examples advanced/mathematical_optimization/auto_examples/ advanced/advanced_numpy/auto_examples/ advanced/image_processing/auto_examples advanced/scipy_sparse/auto_examples packages/3d_plotting/auto_examples packages/statistics/auto_examples/ packages/scikit-image/auto_examples/ packages/scikit-learn/auto_examples intro/numpy/auto_examples guide/auto_examples
 
 test:
-	nosetests -v --with-doctest --doctest-tests --doctest-extension=rst testing.py $(shell find intro advanced -name \*.rst -print)
+	MATPLOTLIBRC=build_tools $(PYTHON) -m pytest --doctest-glob '*.rst' --ignore advanced/advanced_numpy/examples/myobject_test.py --ignore advanced/interfacing_with_c/numpy_c_api/test_cos_module_np.py --ignore advanced/interfacing_with_c/ctypes/cos_module.py --ignore advanced/interfacing_with_c/swig_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/cython_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/ctypes_numpy/cos_doubles.py --ignore advanced/interfacing_with_c/ctypes_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/numpy_shared/test_cos_doubles.py
+
+test-stop-when-failing:
+	MATPLOTLIBRC=build_tools $(PYTHON) -m pytest -x --doctest-glob '*.rst' --ignore advanced/advanced_numpy/examples/myobject_test.py --ignore advanced/interfacing_with_c/numpy_c_api/test_cos_module_np.py --ignore advanced/interfacing_with_c/ctypes/cos_module.py --ignore advanced/interfacing_with_c/swig_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/cython_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/ctypes_numpy/cos_doubles.py --ignore advanced/interfacing_with_c/ctypes_numpy/test_cos_doubles.py --ignore advanced/interfacing_with_c/numpy_shared/test_cos_doubles.py
+
+html-noplot:
+	$(SPHINXBUILD) -D plot_gallery=0 -b html $(ALLSPHINXOPTS) build/html
+	@echo
+	@echo "Build finished. The HTML pages are in build/html."
 
 html:
 	mkdir -p build/html build/doctrees
+	# This line makes the build a bit more lengthy, and the
+	# the embedding of images more robust
+	rm -rf build/html/_images
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) build/html
 	@echo
 	@echo "Build finished. The HTML pages are in build/html."
+
+cleandoctrees:
+	rm -rf build/doctrees
 
 pickle:
 	mkdir -p build/pickle build/doctrees
@@ -56,9 +72,11 @@ htmlhelp:
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in build/htmlhelp."
 
-latex:
+latex: cleandoctrees
 	mkdir -p build/latex build/doctrees
 	$(SPHINXBUILD) -b $@ $(ALLSPHINXOPTS) build/latex
+	sed -i -e 's/\\sphinxincludegraphics/\
+\\sphinxincludegraphics/g' build/latex/ScipyLectures.tex
 	@echo
 	@echo "Build finished; the LaTeX files are in build/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
@@ -81,31 +99,46 @@ linkcheck:
 	      "or in build/linkcheck/output.txt."
 
 pdf: latex
-	cd build/latex ; make all-pdf ; pdfnup PythonScientific.pdf
-	cp build/latex/PythonScientific.pdf PythonScientific-simple.pdf
-	cp build/latex/PythonScientific-nup.pdf PythonScientific.pdf
-	#cd build/latex ; make all-pdf ; pdfnup python4science.pdf
+	cd build/latex ; make all-pdf ; pdfnup ScipyLectures.pdf
+	cp build/latex/ScipyLectures.pdf ScipyLectures-simple.pdf
+	cp build/latex/ScipyLectures-nup.pdf ScipyLectures.pdf
 
-zip: html pdf
+zip: clean html pdf
 	mkdir -p build/scipy_lecture_notes ;
+	cp ScipyLectures.pdf ScipyLectures-simple.pdf build/html/_downloads/
 	cp -r build/html build/scipy_lecture_notes ;
 	cp -r data build/scipy_lecture_notes ;
-	cp PythonScientific.pdf build/scipy_lecture_notes;
+	cp ScipyLectures.pdf build/ ;
 	zip -r build/scipy_lecture_notes.zip build/scipy_lecture_notes  
+	git archive -o build/scipy_lecture_notes-source.zip --prefix scipy_lecture_notes-source/ HEAD
 
-install: pdf html 
+install: cleandoctrees html pdf
 	rm -rf build/scipy-lectures.github.com
+	cp ScipyLectures.pdf ScipyLectures-simple.pdf build/html/_downloads/
 	cd build/ && \
-	git clone git@github.com:scipy-lectures/scipy-lectures.github.com.git && \
+	git clone  --no-checkout --depth 1 git@github.com:scipy-lectures/scipy-lectures.github.com.git && \
 	cp -r html/* scipy-lectures.github.com && \
 	cd scipy-lectures.github.com && \
 	git add * && \
 	git commit -a -m 'Make install' && \
 	git push
- 
+
+rsync_upload: check-rsync-env cleandoctrees html pdf
+	cp ScipyLectures-simple.pdf ScipyLectures.pdf build/html/_downloads/
+	rsync -P -auvz --delete build/html/ $(SSH_USER)@$(SSH_HOST):$(SSH_TARGET_DIR)/
+
+check-rsync-env:
+ifndef SSH_TARGET_DIR
+	$(error SSH_TARGET_DIR is undefined)
+endif
+ifndef SSH_HOST
+	$(error SSH_HOST is undefined)
+endif
+
 epub:
 	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) build/epub
 	@echo
-	@echo "Build finished. The epub file is in _build/epub."
+	@echo "Build finished. The epub file is in build/epub."
 
-
+contributors:
+	git shortlog -sn  2>&1 | awk '{print $$NF, $$0}' | sort | cut -d ' ' -f 2- | sed "s/^  *[0-9][0-9]*	/\n- /"

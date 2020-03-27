@@ -1,31 +1,28 @@
-import pylab as pl
+"""
+Displaying the contours of a function
+======================================
+
+An example showing how to display the contours of a function with
+matplotlib.
+"""
+
 import numpy as np
+import matplotlib.pyplot as plt
 
 def f(x,y):
-    return (1 - x / 2 + x ** 5 + y ** 3) * np.exp(-x ** 2 - y ** 2)
+    return (1 - x / 2 + x**5 + y**3) * np.exp(-x**2 -y**2)
 
 n = 256
 x = np.linspace(-3, 3, n)
 y = np.linspace(-3, 3, n)
-X, Y = np.meshgrid(x, y)
+X,Y = np.meshgrid(x, y)
 
-pl.contourf(X, Y, f(X, Y), 8, alpha=.75, cmap=pl.cm.hot)
-C = pl.contour(X, Y, f(X,Y), 8, colors='black', linewidth=.5)
-pl.clabel(C, inline=1, fontsize=10)
-pl.xticks(())
-pl.yticks(())
+plt.axes([0.025, 0.025, 0.95, 0.95])
 
-pl.text(-0.05, 1.02, " Contour Plot: pl.contour(..)\n",
-      horizontalalignment='left',
-      verticalalignment='top',
-      size='xx-large',
-      bbox=dict(facecolor='white', alpha=1.0, width=400, height=65),
-      transform=pl.gca().transAxes)
+plt.contourf(X, Y, f(X, Y), 8, alpha=.75, cmap=plt.cm.hot)
+C = plt.contour(X, Y, f(X, Y), 8, colors='black', linewidth=.5)
+plt.clabel(C, inline=1, fontsize=10)
 
-pl.text(-0.05, 1.01, "\n\n  Draw contour lines and filled contours ",
-      horizontalalignment='left',
-      verticalalignment='top',
-      size='large',
-      transform=pl.gca().transAxes)
-
-pl.show()
+plt.xticks([])
+plt.yticks([])
+plt.show()

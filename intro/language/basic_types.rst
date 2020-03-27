@@ -13,13 +13,13 @@ Numerical types
     >>> 1 + 1
     2
     >>> a = 4
-    >>> type(a)
+    >>> type(a)   # doctest: +SKIP
     <type 'int'>
 
 :Floats:
 
     >>> c = 2.1
-    >>> type(c)
+    >>> type(c)   # doctest: +SKIP
     <type 'float'>
 
 :Complex:
@@ -29,7 +29,7 @@ Numerical types
     1.5
     >>> a.imag
     0.5
-    >>> type(1. + 0j )
+    >>> type(1. + 0j)   # doctest: +SKIP
     <type 'complex'>
 
 :Booleans:
@@ -39,7 +39,7 @@ Numerical types
     >>> test = (3 > 4)
     >>> test
     False
-    >>> type(test)
+    >>> type(test)      # doctest: +SKIP
     <type 'bool'>
 
 .. tip::
@@ -64,21 +64,32 @@ Type conversion (casting)::
 
 .. warning:: Integer division
 
-    ::
+    In Python 2::
 
-        >>> 3 / 2
+        >>> 3 / 2   # doctest: +SKIP
         1
 
-    **Trick**: use floats::
+    In Python 3::
+
+        >>> 3 / 2   # doctest: +SKIP
+        1.5
+
+    **To be safe**: use floats::
 
         >>> 3 / 2.
         1.5
 
         >>> a = 3
         >>> b = 2
-        >>> a / b
+        >>> a / b # In Python 2  # doctest: +SKIP
         1
         >>> a / float(b)
+        1.5
+
+    **Future behavior**: to always get the behavior of Python3
+
+        >>> from __future__ import division  # doctest: +SKIP
+        >>> 3 / 2  # doctest: +SKIP
         1.5
 
     .. tip::
@@ -90,10 +101,8 @@ Type conversion (casting)::
 
       .. note::
 
-        The behaviour of the division operator has changed in Python 3. Please
-        look at the `python3porting
-        <http://python3porting.com/preparing.html#use-instead-of-when-dividing-integers>`_
-        website for details.
+        The behaviour of the division operator has changed in `Python 3
+        <http://python3porting.com/preparing.html#use-instead-of-when-dividing-integers>`_.
 
 Containers
 ------------
@@ -113,20 +122,20 @@ Lists
 
 ::
 
-    >>> L = ['red', 'blue', 'green', 'black', 'white']
-    >>> type(L)
+    >>> colors = ['red', 'blue', 'green', 'black', 'white']
+    >>> type(colors)     # doctest: +SKIP
     <type 'list'>
 
 Indexing: accessing individual objects contained in the list::
 
-    >>> L[2]
+    >>> colors[2]
     'green'
 
 Counting from the end with negative indices::
 
-    >>> L[-1]
+    >>> colors[-1]
     'white'
-    >>> L[-2]
+    >>> colors[-2]
     'black'
 
 .. warning::
@@ -135,49 +144,49 @@ Counting from the end with negative indices::
 
 Slicing: obtaining sublists of regularly-spaced elements::
 
-    >>> L
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white']
-    >>> L[2:4]
+    >>> colors[2:4]
     ['green', 'black']
 
 .. Warning::
 
-    Note that ``L[start:stop]`` contains the elements with indices ``i``
+    Note that ``colors[start:stop]`` contains the elements with indices ``i``
     such as  ``start<= i < stop`` (``i`` ranging from ``start`` to
-    ``stop-1``). Therefore, ``L[start:stop]`` has ``(stop-start)`` elements.
+    ``stop-1``). Therefore, ``colors[start:stop]`` has ``(stop - start)`` elements.
 
-**Slicing syntax**: ``L[start:stop:stride]``
+**Slicing syntax**: ``colors[start:stop:stride]``
 
 .. tip::
 
   All slicing parameters are optional::
 
-    >>> L
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white']
-    >>> L[3:]
+    >>> colors[3:]
     ['black', 'white']
-    >>> L[:3]
+    >>> colors[:3]
     ['red', 'blue', 'green']
-    >>> L[::2]
+    >>> colors[::2]
     ['red', 'green', 'white']
 
 Lists are *mutable* objects and can be modified::
 
-    >>> L[0] = 'yellow'
-    >>> L
+    >>> colors[0] = 'yellow'
+    >>> colors
     ['yellow', 'blue', 'green', 'black', 'white']
-    >>> L[2:4] = ['gray', 'purple']
-    >>> L
+    >>> colors[2:4] = ['gray', 'purple']
+    >>> colors
     ['yellow', 'blue', 'gray', 'purple', 'white']
 
 .. Note::
 
    The elements of a list may have different types::
 
-        >>> L = [3, -200, 'hello']
-        >>> L
+        >>> colors = [3, -200, 'hello']
+        >>> colors
         [3, -200, 'hello']
-        >>> L[1], L[2]
+        >>> colors[1], colors[2]
         (-200, 'hello')
 
    .. tip::
@@ -195,42 +204,42 @@ Lists are *mutable* objects and can be modified::
 
     Python offers a large panel of functions to modify lists, or query
     them. Here are a few examples; for more details, see
-    http://docs.python.org/tutorial/datastructures.html#more-on-lists
+    https://docs.python.org/tutorial/datastructures.html#more-on-lists
 
 Add and remove elements::
 
-    >>> L = ['red', 'blue', 'green', 'black', 'white']
-    >>> L.append('pink')
-    >>> L
+    >>> colors = ['red', 'blue', 'green', 'black', 'white']
+    >>> colors.append('pink')
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white', 'pink']
-    >>> L.pop() # removes and returns the last item
+    >>> colors.pop() # removes and returns the last item
     'pink'
-    >>> L
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white']
-    >>> L.extend(['pink', 'purple']) # extend L, in-place
-    >>> L
+    >>> colors.extend(['pink', 'purple']) # extend colors, in-place
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white', 'pink', 'purple']
-    >>> L = L[:-2]
-    >>> L
+    >>> colors = colors[:-2]
+    >>> colors
     ['red', 'blue', 'green', 'black', 'white']
 
 Reverse::
 
-    >>> r = L[::-1]
-    >>> r
+    >>> rcolors = colors[::-1]
+    >>> rcolors
     ['white', 'black', 'green', 'blue', 'red']
-    >>> r2 = list(L)
-    >>> r2
+    >>> rcolors2 = list(colors) # new object that is a copy of colors in a different memory area
+    >>> rcolors2
     ['red', 'blue', 'green', 'black', 'white']
-    >>> r2.reverse() # in-place
-    >>> r2
+    >>> rcolors2.reverse() # in-place; reversing rcolors2 does not affect colors
+    >>> rcolors2
     ['white', 'black', 'green', 'blue', 'red']
 
 Concatenate and repeat lists::
 
-    >>> r + L
+    >>> rcolors + colors
     ['white', 'black', 'green', 'blue', 'red', 'red', 'blue', 'green', 'black', 'white']
-    >>> r * 2
+    >>> rcolors * 2
     ['white', 'black', 'green', 'blue', 'red', 'white', 'black', 'green', 'blue', 'red']
 
 
@@ -238,19 +247,19 @@ Concatenate and repeat lists::
 
   Sort::
 
-    >>> sorted(r) # new object
+    >>> sorted(rcolors) # new object
     ['black', 'blue', 'green', 'red', 'white']
-    >>> r
+    >>> rcolors
     ['white', 'black', 'green', 'blue', 'red']
-    >>> r.sort()  # in-place
-    >>> r
+    >>> rcolors.sort()  # in-place
+    >>> rcolors
     ['black', 'blue', 'green', 'red', 'white']
 
 .. topic:: **Methods and Object-Oriented Programming**
 
-    The notation ``r.method()`` (e.g. ``r.append(3)`` and ``L.pop()``) is our
+    The notation ``rcolors.method()`` (e.g. ``rcolors.append(3)`` and ``colors.pop()``) is our
     first example of object-oriented programming (OOP). Being a ``list``, the
-    object `r` owns the *method* `function` that is called using the notation
+    object `rcolors` owns the *method* `function` that is called using the notation
     **.**. No further knowledge of OOP than understanding the notation **.** is
     necessary for going through this tutorial.
 
@@ -261,22 +270,10 @@ Concatenate and repeat lists::
 
     .. sourcecode:: ipython
 
-        In [28]: r.<TAB>
-        r.__add__           r.__iadd__          r.__setattr__
-        r.__class__         r.__imul__          r.__setitem__
-        r.__contains__      r.__init__          r.__setslice__
-        r.__delattr__       r.__iter__          r.__sizeof__
-        r.__delitem__       r.__le__            r.__str__
-        r.__delslice__      r.__len__           r.__subclasshook__
-        r.__doc__           r.__lt__            r.append
-        r.__eq__            r.__mul__           r.count
-        r.__format__        r.__ne__            r.extend
-        r.__ge__            r.__new__           r.index
-        r.__getattribute__  r.__reduce__        r.insert
-        r.__getitem__       r.__reduce_ex__     r.pop
-        r.__getslice__      r.__repr__          r.remove
-        r.__gt__            r.__reversed__      r.reverse
-        r.__hash__          r.__rmul__          r.sort
+        In [28]: rcolors.<TAB>
+        rcolors.append   rcolors.index    rcolors.remove   
+        rcolors.count    rcolors.insert   rcolors.reverse  
+        rcolors.extend   rcolors.pop      rcolors.sort    
 
 Strings
 ~~~~~~~
@@ -285,8 +282,9 @@ Different string syntaxes (simple, double or triple quotes)::
 
     s = 'Hello, how are you?'
     s = "Hi, what's up"
-    s = '''Hello,                 # tripling the quotes allows the
-           how are you'''         # the string to span more than one line
+    s = '''Hello,
+           how are you'''         # tripling the quotes allows the
+                                  # string to span more than one line
     s = """Hi,
     what's up?"""
 
@@ -299,9 +297,10 @@ Different string syntaxes (simple, double or triple quotes)::
                ^
     SyntaxError: invalid syntax
 
-
-The newline character is ``\n``, and the tab character is
-``\t``.
+This syntax error can be avoided by enclosing the string in double quotes
+instead of single quotes. Alternatively, one can prepend a backslash to the
+second single quote. Other uses of the backslash are, e.g., the newline character
+``\n`` and the tab character ``\t``.
 
 .. tip::
 
@@ -336,9 +335,8 @@ Slicing::
 
 .. tip::
    
-    Accents and special characters can also be handled in Unicode strings
-    (see
-    http://docs.python.org/tutorial/introduction.html#unicode-strings).
+    Accents and special characters can also be handled as in Python 3
+    strings consist of Unicode characters.
 
 
 A string is an **immutable object** and it is not possible to modify its
@@ -368,16 +366,16 @@ contents. One may however create new strings from the original one.
 
     Python offers advanced possibilities for manipulating strings,
     looking for patterns or formatting. The interested reader is referred to
-    http://docs.python.org/library/stdtypes.html#string-methods and
-    http://docs.python.org/library/string.html#new-string-formatting
+    https://docs.python.org/library/stdtypes.html#string-methods and
+    https://docs.python.org/3/library/string.html#format-string-syntax
 
 String formatting::
 
-    >>> 'An integer: %i; a float: %f; another string: %s' % (1, 0.1, 'string')
+    >>> 'An integer: %i; a float: %f; another string: %s' % (1, 0.1, 'string') # with more values use tuple after %
     'An integer: 1; a float: 0.100000; another string: string'
 
     >>> i = 102
-    >>> filename = 'processing_of_dataset_%d.txt' % i
+    >>> filename = 'processing_of_dataset_%d.txt' % i   # no need for tuples with just one value after %
     >>> filename
     'processing_of_dataset_102.txt'
 
@@ -393,13 +391,13 @@ Dictionaries
 
     >>> tel = {'emmanuelle': 5752, 'sebastian': 5578}
     >>> tel['francis'] = 5915
-    >>> tel
+    >>> tel     # doctest: +SKIP
     {'sebastian': 5578, 'francis': 5915, 'emmanuelle': 5752}
     >>> tel['sebastian']
     5578
-    >>> tel.keys()
+    >>> tel.keys()   # doctest: +SKIP
     ['sebastian', 'francis', 'emmanuelle']
-    >>> tel.values()
+    >>> tel.values()   # doctest: +SKIP
     [5578, 5915, 5752]
     >>> 'francis' in tel
     True
@@ -408,13 +406,13 @@ Dictionaries
 
   It can be used to conveniently store and retrieve values
   associated with a name (a string for a date, a name, etc.). See
-  http://docs.python.org/tutorial/datastructures.html#dictionaries
+  https://docs.python.org/tutorial/datastructures.html#dictionaries
   for more information.
 
   A dictionary can have keys (resp. values) with different types::
 
     >>> d = {'a':1, 'b':2, 3:'hello'}
-    >>> d
+    >>> d       # doctest: +SKIP
     {'a': 1, 3: 'hello', 'b': 2}
 
 More container types
@@ -435,9 +433,9 @@ between parentheses, or just separated by commas::
 **Sets:** unordered, unique items::
 
     >>> s = set(('a', 'b', 'c', 'a'))
-    >>> s
+    >>> s    # doctest: +SKIP
     set(['a', 'c', 'b'])
-    >>> s.difference(('a', 'b'))
+    >>> s.difference(('a', 'b'))    # doctest: +SKIP
     set(['c'])
 
 Assignment operator
@@ -446,7 +444,7 @@ Assignment operator
 .. tip::
 
  `Python library reference
- <http://docs.python.org/reference/simple_stmts.html#assignment-statements>`_
+ <https://docs.python.org/reference/simple_stmts.html#assignment-statements>`_
  says:
 
   Assignment statements are used to (re)bind names to values and to

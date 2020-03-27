@@ -1,5 +1,10 @@
-Python Scientific Lecture Notes 
-===================================================================
+Scipy Lecture Notes 
+===========================
+
+.. only:: html
+
+   One document to learn numerics, science, and data with Python
+   --------------------------------------------------------------
 
 .. raw html to center the title
 
@@ -8,70 +13,101 @@ Python Scientific Lecture Notes
   <style type="text/css">
     div.documentwrapper h1 {
         text-align: center;
-        font-size: 200% ;
+        font-size: 280% ;
         font-weight: bold;
-        margin-bottom: 30px;
+        margin-bottom: 4px;
+    }
+
+    div.documentwrapper h2 {
+        background-color: white;
+        border: none;
+        font-size: 130%;
+        text-align: center;
+        margin-bottom: 40px;
+        margin-top: 4px;
+    }
+
+    a.headerlink:after {
+        content: "";
     }
 
     div.sidebar {
         margin-right: -20px;
         margin-top: -10px;
         border-radius: 6px;
+        font-family: FontAwesome, sans-serif;
+        min-width: 200pt;
     }
-  
+
+    div.sidebar ul {
+        list-style: none;
+        text-indent: -3ex;
+        color: #555;
+    }
+
+    @media only screen and (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 70ex)  {
+        div.sidebar ul {
+            text-indent: 0ex;
+        }
+    }
+
+    div.sidebar li {
+        margin-top: .5ex;
+    }
+
+    div.preface {
+        margin-top: 20px;
+    }
+
   </style>
 
 .. nice layout in the toc
 
-.. include:: tune_toc.rst 
+.. include:: tune_toc.rst
+
+.. |pdf| unicode:: U+f1c1 .. PDF file
+
+.. |archive| unicode:: U+f187 .. archive file
+
+.. |github| unicode:: U+f09b  .. github logo
 
 .. only:: html
 
-    .. sidebar:: Download 
+    .. sidebar::  Download 
        
-       * `PDF, 2 pages per side <./_downloads/PythonScientific.pdf>`_
+       |pdf| `PDF, 2 pages per side <./_downloads/ScipyLectures.pdf>`_
 
-       * `PDF, 1 page per side <./_downloads/PythonScientific-simple.pdf>`_
+       |pdf| `PDF, 1 page per side <./_downloads/ScipyLectures-simple.pdf>`_
    
-       * `HTML and example files <https://github.com/scipy-lectures/scipy-lectures.github.com/zipball/master>`_
+       |archive| `HTML and example files <https://github.com/scipy-lectures/scipy-lectures.github.com/zipball/master>`_
      
-       * `Source code (github) <https://github.com/scipy-lectures/scipy-lecture-notes>`_
+       |github| `Source code (github) <https://github.com/scipy-lectures/scipy-lecture-notes>`_
 
-    .. topic:: This document
 
-        Tutorial material on the scientific Python ecosystem, a quick
-        introduction to central tools and techniques. The different chapters
-        each correspond to a 1 to 2 hours course with increasing level of
-        expertise, from beginner to expert.
+    Tutorials on the scientific Python ecosystem: a quick introduction to
+    central tools and techniques. The different chapters each correspond
+    to a 1 to 2 hours course with increasing level of expertise, from
+    beginner to expert.
+
+    .. rst-class:: preface
 
         .. toctree::
-            :maxdepth: 1
+            :maxdepth: 2
 
-            AUTHORS.rst
-            CHANGES.rst
-            README.rst
-            LICENSE.rst
+            preface.rst
 
-_____
+|
 
-.. toctree::
-   :numbered:
+.. rst-class:: tune
 
-   intro/index.rst
-   advanced/index.rst
-   packages/index.rst
-____
+  .. toctree::
+    :numbered: 4
 
+    intro/index.rst
+    advanced/index.rst
+    packages/index.rst
 
-.. only:: html
-
- .. raw:: html
-
-   <small style="color: gray">
-
- Version: |version| (output of ``git describe`` for `project repository`_)
-
- .. _`project repository`: https://github.com/scipy-lectures/scipy-lecture-notes
+|
 
 ..  
  FIXME: I need the link below to make sure the banner gets copied to the
@@ -81,15 +117,25 @@ ____
 
  .. raw:: html
  
-   <div style='visibility: hidden ; height=0'>
+   <div style='display: none; height=0px;'>
 
- :download:`PythonScientific.pdf` :download:`PythonScientific-simple.pdf`
+ :download:`ScipyLectures.pdf` :download:`ScipyLectures-simple.pdf`
  
  .. image:: themes/plusBox.png
+
+ .. image:: images/logo.svg
 
  .. raw:: html
  
    </div>
    </small>
+
+
+..
+    >>> # For doctest on headless environments (needs to happen early)
+    >>> import matplotlib
+    >>> matplotlib.use('Agg')
+
+
 
 

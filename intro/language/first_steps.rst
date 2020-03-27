@@ -8,8 +8,14 @@ Start the **Ipython** shell (an enhanced interactive Python shell):
 * **or** by starting the program from a menu, e.g. in the `Python(x,y)`_ or
   `EPD`_ menu if you have installed one of these scientific-Python suites.
 
+.. _`Python(x,y)`: https://python-xy.github.io/
+* **or** by starting the program from a menu, e.g. the `Anaconda Navigator`_,
+  the `Python(x,y)`_ menu or the `EPD`_ menu if you have installed one of these
+  scientific-Python suites.
+
+.. _`Anaconda Navigator`: https://anaconda.org/anaconda/anaconda-navigator
 .. _`Python(x,y)`: http://www.pythonxy.com/
-.. _`EPD`: http://www.enthought.com/products/epd.php
+.. _`EPD`: http://store.enthought.com/
 
 .. tip::
 
@@ -21,7 +27,7 @@ Start the **Ipython** shell (an enhanced interactive Python shell):
 
 Once you have started the interpreter, type ::
 
-    >>> print "Hello, world!"
+    >>> print("Hello, world!")
     Hello, world!
 
 .. tip::
@@ -33,24 +39,27 @@ To get yourself started, type the following stack of instructions ::
 
     >>> a = 3
     >>> b = 2*a
-    >>> type(b)
+    >>> type(b)     # doctest: +SKIP
     <type 'int'>
-    >>> print b
+    >>> print(b)
     6
     >>> a*b 
     18
     >>> b = 'hello' 
-    >>> type(b)
+    >>> type(b)    # doctest: +SKIP
     <type 'str'>
     >>> b + b
     'hellohello'
     >>> 2*b
     'hellohello'
 
+.. We need to skip the call to 'type' because in Python3 is prints as
+   'type', but in Python2 as 'class'
+
 .. tip::
 
   Two variables ``a`` and ``b`` have been defined above. Note that one does
-  not declare the type of an variable before assigning its value. In C,
+  not declare the type of a variable before assigning its value. In C,
   conversely, one should write:
 
   .. sourcecode:: c

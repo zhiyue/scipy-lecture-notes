@@ -1,9 +1,9 @@
-""" Wiener filtering a noisy Lena: this module is buggy
+""" Wiener filtering a noisy racoon face: this module is buggy
 """
 
 import numpy as np
 import scipy as sp
-import pylab as pl
+import matplotlib.pyplot as plt
 from scipy import signal
 
 
@@ -48,14 +48,14 @@ cut = (slice(128, -128), slice(128, -128))
 
 np.random.seed(7)
 
-lena = sp.misc.lena()
-noisy_lena = lena + 20*np.random.randint(3, size=lena.shape) - 30
+face = sp.misc.face(gray=True)
+noisy_face = face + 20*np.random.randint(3, size=face.shape) - 30
 
-pl.matshow(lena[cut], cmap=pl.cm.gray)
-pl.matshow(noisy_lena[cut], cmap=pl.cm.gray)
+plt.matshow(face[cut], cmap=plt.cm.gray)
+plt.matshow(noisy_face[cut], cmap=plt.cm.gray)
 
-denoised_lena = iterated_wiener(noisy_lena)
-pl.matshow(denoised_lena[cut], cmap=pl.cm.gray)
+denoised_face = iterated_wiener(noisy_face)
+plt.matshow(denoised_face[cut], cmap=plt.cm.gray)
 
-pl.show()
+plt.show()
 

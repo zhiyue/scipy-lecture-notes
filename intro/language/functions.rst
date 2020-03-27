@@ -114,7 +114,7 @@ Keyword arguments allow you to specify *default values*.
        In [2]: def add_to_dict(args={'a': 1, 'b': 2}):
           ...:     for i in args.keys():
           ...:         args[i] += 1
-          ...:     print args
+          ...:     print(args)
           ...:
 
        In [3]: add_to_dict
@@ -283,8 +283,8 @@ Special forms of parameters:
 .. sourcecode:: ipython
 
     In [35]: def variable_args(*args, **kwargs):
-       ....:     print 'args is', args
-       ....:     print 'kwargs is', kwargs
+       ....:     print('args is', args)
+       ....:     print('kwargs is', kwargs)
        ....:
 
     In [36]: variable_args('one', 'two', x=1, y=2, z=3)
@@ -325,7 +325,7 @@ convention:
 
 
     For the sake of standardization, the `Docstring
-    Conventions <http://www.python.org/dev/peps/pep-0257>`_ webpage
+    Conventions <https://www.python.org/dev/peps/pep-0257>`_ webpage
     documents the semantics and conventions associated with Python
     docstrings.
 
@@ -333,8 +333,7 @@ convention:
     for documenting scientific functions, that you may want to follow for
     your own functions, with a ``Parameters`` section, an ``Examples``
     section, etc. See
-    http://projects.scipy.org/numpy/wiki/CodingStyleGuidelines#docstring-standard
-    and http://projects.scipy.org/numpy/browser/trunk/doc/example.py#L37
+    https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
 Functions are objects
 ---------------------
@@ -368,15 +367,23 @@ Exercises
     Write a function that displays the ``n`` first terms of the Fibonacci
     sequence, defined by:
 
-    * ``u_0 = 1; u_1 = 1``
-    * ``u_(n+2) = u_(n+1) + u_n``
+    .. math::
+        \left\{
+            \begin{array}{ll}
+                U_{0} = 0 \\
+                U_{1} = 1 \\
+                U_{n+2} = U_{n+1} + U_{n}
+            \end{array}
+        \right.
 
 .. :ref:`fibonacci`
 
 .. topic:: Exercise: Quicksort
     :class: green
 
-    Implement the quicksort algorithm, as defined by wikipedia::
+    Implement the quicksort algorithm, as defined by wikipedia
+
+.. parsed-literal::
 
     function quicksort(array)
         var list less, greater

@@ -1,3 +1,7 @@
+.. for doctests
+   >>> import matplotlib.pyplot as plt
+   >>> plt.switch_backend("Agg")
+
 .. _numpy_exercises:
 
 Some exercises
@@ -20,6 +24,7 @@ Array manipulations
 
    .. sourcecode:: pycon
 
+        >>> import numpy as np
         >>> a = np.arange(25).reshape(5, 5)
 
    elementwise with the array ``b = np.array([1., 5, 10, 15, 20])``.
@@ -36,75 +41,74 @@ Array manipulations
      ``j``.)
 
 
-Picture manipulation: Framing Lena
------------------------------------
+Picture manipulation: Framing a Face
+------------------------------------
 
-Let's do some manipulations on numpy arrays by starting with the
-famous image of Lena (http://www.cs.cmu.edu/~chuck/lennapg/).
-``scipy`` provides a 2D array of this image with the ``scipy.lena``
-function::
+Let's do some manipulations on numpy arrays by starting with an image
+of a racoon.  ``scipy`` provides a 2D array of this image with the
+``scipy.misc.face`` function::
 
 
     >>> from scipy import misc
-    >>> lena = misc.lena()
-
-**Note:** In older versions of scipy, you will find lena under
-``scipy.lena()``
+    >>> face = misc.face(gray=True)  # 2D grayscale image
 
 Here are a few images we will be able to obtain with our manipulations:
 use different colormaps, crop the image, change some parts of the image.
 
-.. image:: images/lenas.png
+.. image:: images/faces.png
     :align: center
 
-* Let's use the imshow function of pylab to display the image.
+* Let's use the imshow function of matplotlib to display the image.
 
-    .. sourcecode:: ipython
+    .. sourcecode:: pycon
 
-        In [3]: import pylab as plt
-        In [4]: lena = misc.lena()
-        In [5]: plt.imshow(lena)
+        >>> import matplotlib.pyplot as plt
+        >>> face = misc.face(gray=True)
+        >>> plt.imshow(face)    # doctest: +ELLIPSIS
+        <matplotlib.image.AxesImage object at 0x...>
 
-* Lena is then displayed in false colors. A colormap must be
-    specified for her to be displayed in grey.
+* The face is displayed in false colors. A colormap must be
+    specified for it to be displayed in grey.
 
-    .. sourcecode:: ipython
+    .. sourcecode:: pycon
 
-        In [6]: plt.imshow(lena, cmap=plt.cm.gray)
+        >>> plt.imshow(face, cmap=plt.cm.gray)    # doctest: +ELLIPSIS
+        <matplotlib.image.AxesImage object at 0x...>
 
 * Create an array of the image with a narrower centering : for example,
-    remove 30 pixels from all the borders of the image. To check the result,
+    remove 100 pixels from all the borders of the image. To check the result,
     display this new array with ``imshow``.
 
-    .. sourcecode:: ipython
+    .. sourcecode:: pycon
 
-        In [9]: crop_lena = lena[30:-30,30:-30]
+        >>> crop_face = face[100:-100, 100:-100]
 
-* We will now frame Lena's face with a black locket. For this, we
+* We will now frame the face with a black locket. For this, we
     need to create a mask corresponding to the pixels we want to be
-    black. The mask is defined by this condition ``(y-256)**2 +
-    (x-256)**2``
+    black. The center of the face is around (660, 330), so we defined
+    the mask by this condition ``(y-300)**2 + (x-660)**2``
 
-    .. sourcecode:: ipython
+    .. sourcecode:: pycon
 
-        In [15]: y, x = np.ogrid[0:512,0:512] # x and y indices of pixels
-        In [16]: y.shape, x.shape
-        Out[16]: ((512, 1), (1, 512))
-        In [17]: centerx, centery = (256, 256) # center of the image
-        In [18]: mask = ((y - centery)**2 + (x - centerx)**2) > 230**2 # circle
+        >>> sy, sx = face.shape
+        >>> y, x = np.ogrid[0:sy, 0:sx] # x and y indices of pixels
+        >>> y.shape, x.shape
+        ((768, 1), (1, 1024))
+        >>> centerx, centery = (660, 300) # center of the image
+        >>> mask = ((y - centery)**2 + (x - centerx)**2) > 230**2 # circle
 
     then we assign the value 0 to the pixels of the image corresponding
     to the mask. The syntax is extremely simple and intuitive:
 
-    .. sourcecode:: ipython
+    .. sourcecode:: pycon
 
-        In [19]: lena[mask] = 0
-        In [20]: plt.imshow(lena)
-        Out[20]: <matplotlib.image.AxesImage object at 0xa36534c>
+        >>> face[mask] = 0
+        >>> plt.imshow(face)    # doctest: +ELLIPSIS
+        <matplotlib.image.AxesImage object at 0x...>
 
 * Follow-up: copy all instructions of this exercise in a script called
-    ``lena_locket.py`` then execute this script in IPython with ``%run
-    lena_locket.py``.
+    ``face_locket.py`` then execute this script in IPython with ``%run
+    face_locket.py``.
 
     Change the circle to an ellipsoid.
 
@@ -120,14 +124,18 @@ northern Canada during 20 years:
  >>> data = np.loadtxt('data/populations.txt')
  >>> year, hares, lynxes, carrots = data.T  # trick: columns to variables
 
+ >>> import matplotlib.pyplot as plt
  >>> plt.axes([0.2, 0.1, 0.5, 0.8]) # doctest: +ELLIPSIS
- <matplotlib.axes.Axes object at ...>
+ <matplotlib.axes...Axes object at ...>
  >>> plt.plot(year, hares, year, lynxes, year, carrots) # doctest: +ELLIPSIS
  [<matplotlib.lines.Line2D object at ...>, ...]
  >>> plt.legend(('Hare', 'Lynx', 'Carrot'), loc=(1.05, 0.5)) # doctest: +ELLIPSIS
  <matplotlib.legend.Legend object at ...>
 
-.. plot:: pyplots/numpy_intro_7.py
+.. image:: auto_examples/images/sphx_glr_plot_populations_001.png
+   :width: 50%
+   :target: auto_examples/plot_populations.html
+   :align: center
 
 Computes and print, based on the data in ``populations.txt``...
 
@@ -182,7 +190,10 @@ Solution: :download:`Python source file <solutions/2_3_crude_integration.py>`
 Mandelbrot set
 ---------------
 
-.. plot:: intro/numpy/solutions/2_4_mandelbrot.py
+.. image:: auto_examples/images/sphx_glr_plot_mandelbrot_001.png
+   :width: 50%
+   :target: auto_examples/plot_mandelbrot.html
+   :align: center
 
 Write a script that computes the Mandelbrot fractal. The Mandelbrot
 iteration::
@@ -192,10 +203,11 @@ iteration::
 
     c = x + 1j*y
 
-    for j in xrange(N_max):
+    z = 0
+    for j in range(N_max):
         z = z**2 + c
 
-Point (x, y) belongs to the Mandelbrot set if :math:`|c|` <
+Point (x, y) belongs to the Mandelbrot set if :math:`|z|` <
 ``some_threshold``.
 
 Do this computation by:
@@ -227,7 +239,7 @@ Markov chain
 .. image:: images/markov-chain.png
 
 Markov chain transition matrix ``P``, and probability distribution on
-the states ``p``::
+the states ``p``:
 
 1. ``0 <= P[i,j] <= 1``: probability to go from state ``i`` to state ``j``
 

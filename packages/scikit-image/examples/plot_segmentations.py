@@ -1,4 +1,7 @@
 """
+Watershed and random walker for segmentation
+============================================
+
 This example compares two segmentation methods in order to separate two
 connected disks: the watershed algorithm, and the random walker algorithm.
 
@@ -10,7 +13,7 @@ background are used as seeds.
 import numpy as np
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
-from skimage import morphology
+from skimage import measure
 from skimage.segmentation import random_walker
 import matplotlib.pyplot as plt
 from scipy import ndimage
@@ -28,7 +31,7 @@ image = np.logical_or(mask_circle1, mask_circle2)
 distance = ndimage.distance_transform_edt(image)
 local_maxi = peak_local_max(
     distance, indices=False, footprint=np.ones((3, 3)), labels=image)
-markers = morphology.label(local_maxi)
+markers = measure.label(local_maxi)
 labels_ws = watershed(-distance, markers, mask=image)
 
 markers[~image] = -1
@@ -44,11 +47,11 @@ plt.imshow(-distance, interpolation='nearest')
 plt.axis('off')
 plt.title('distance map')
 plt.subplot(143)
-plt.imshow(labels_ws, cmap='spectral', interpolation='nearest')
+plt.imshow(labels_ws, cmap='nipy_spectral', interpolation='nearest')
 plt.axis('off')
 plt.title('watershed segmentation')
 plt.subplot(144)
-plt.imshow(labels_rw, cmap='spectral', interpolation='nearest')
+plt.imshow(labels_rw, cmap='nipy_spectral', interpolation='nearest')
 plt.axis('off')
 plt.title('random walker segmentation')
 

@@ -5,9 +5,10 @@
 ==========================
 Advanced Python Constructs
 ==========================
-:author: Zbigniew Jędrzejewski-Szmek
 
-This chapter is about some features of the Python language which can
+**Author** *Zbigniew Jędrzejewski-Szmek*
+
+This section covers some features of the Python language which can
 be considered advanced --- in the sense that not every language has
 them, and also in the sense that they are more useful in more
 complicated programs or libraries, but not in the sense of being
@@ -19,20 +20,15 @@ complemented by functionality of the Python stdlib, which could not be
 implemented through clever external modules.
 
 The process of developing the Python programming language, its syntax,
-is unique because it is very transparent, proposed changes are
-evaluated from various angles and discussed on public mailing lists,
-and the final decision takes into account the balance between the
-importance of envisioned use cases, the burden of carrying more
-language features, consistency with the rest of the syntax, and
-whether the proposed variant is the easiest to read, write, and
-understand. This process is formalised in Python Enhancement
-Proposals --- PEPs_. As a result, features described in this chapter
+is very transparent; proposed changes are
+evaluated from various angles and discussed via *Python Enhancement
+Proposals* --- PEPs_. As a result, features described in this chapter
 were added after it was shown that they indeed solve real problems and
 that their use is as simple as possible.
 
-.. _PEPs: http://www.python.org/dev/peps/
+.. _PEPs: https://www.python.org/dev/peps/
 
-.. contents:: Chapters contents
+.. contents:: Chapter contents
    :local:
    :depth: 4
 
@@ -62,7 +58,7 @@ which, when called, returns the next item in the sequence, and when
 there's nothing to return, raises the
 `StopIteration <exceptions.StopIteration>` exception.
 
-.. _`iterator protocol`: http://docs.python.org/dev/library/stdtypes.html#iterator-types
+.. _`iterator protocol`: https://docs.python.org/dev/library/stdtypes.html#iterator-types
 
 An iterator object allows to loop just once. It
 holds the state (position) of a single iteration, or from the other
@@ -74,27 +70,27 @@ sequence allows us to have more than one way of iteration.
 Calling the `__iter__ <object.__iter__>` method on a container to
 create an iterator object is the most straightforward way to get hold
 of an iterator. The `iter` function does that for us, saving a few
-keystrokes.
+keystrokes. ::
 
->>> nums = [1,2,3]      # note that ... varies: these are different objects
->>> iter(nums)                           # doctest: +ELLIPSIS
-<listiterator object at ...>
->>> nums.__iter__()                      # doctest: +ELLIPSIS
-<listiterator object at ...>
->>> nums.__reversed__()                  # doctest: +ELLIPSIS
-<listreverseiterator object at ...>
+    >>> nums = [1, 2, 3]      # note that ... varies: these are different objects
+    >>> iter(nums)                           # doctest: +ELLIPSIS
+    <...iterator object at ...>
+    >>> nums.__iter__()                      # doctest: +ELLIPSIS
+    <...iterator object at ...>
+    >>> nums.__reversed__()                  # doctest: +ELLIPSIS
+    <...reverseiterator object at ...>
 
->>> it = iter(nums)
->>> next(it)            # next(obj) simply calls obj.next()
-1
->>> it.next()
-2
->>> next(it)
-3
->>> next(it)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-StopIteration
+    >>> it = iter(nums)
+    >>> next(it)
+    1
+    >>> next(it)
+    2
+    >>> next(it)
+    3
+    >>> next(it)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    StopIteration
 
 When used in a loop, `StopIteration <exceptions.StopIteration>` is
 swallowed and causes the loop to finish. But with explicit invocation,
@@ -138,27 +134,18 @@ the process is short-circuited and we get a ``list``. ::
     >>> list(i for i in nums)
     [1, 2, 3]
 
-In Python 2.7 and 3.x the list comprehension syntax was extended to
+The list comprehension syntax also extends to
 **dictionary and set comprehensions**.
 A ``set`` is created when the generator expression is enclosed in curly
 braces. A ``dict`` is created when the generator expression contains
 "pairs" of the form ``key:value``::
 
-    >>> {i for i in range(3)}   # doctest: +SKIP
+    >>> {i for i in range(3)}  # doctest: +SKIP
     set([0, 1, 2])
     >>> {i:i**2 for i in range(3)}   # doctest: +SKIP
     {0: 0, 1: 1, 2: 4}
 
-If you are stuck at some previous Python version, the syntax is only a
-bit worse: ::
-
-    >>> set(i for i in 'abc')
-    set(['a', 'c', 'b'])
-    >>> dict((i, ord(i)) for i in 'abc')
-    {'a': 97, 'c': 99, 'b': 98}
-
-Generator expression are fairly simple, not much to say here. Only one
-*gotcha* should be mentioned: in old Pythons the index variable
+One *gotcha* should be mentioned: in old Pythons the index variable
 (``i``) would leak, and in versions >= 3 this is fixed.
 
 Generators
@@ -197,11 +184,11 @@ execution of this function is suspended. ::
     >>> f()                                   # doctest: +ELLIPSIS
     <generator object f at 0x...>
     >>> gen = f()
-    >>> gen.next()
+    >>> next(gen)
     1
-    >>> gen.next()
+    >>> next(gen)
     2
-    >>> gen.next()
+    >>> next(gen)
     Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
     StopIteration
@@ -318,18 +305,18 @@ send and throw. ::
 
     >>> import itertools
     >>> def g():
-    ...     print '--start--'
+    ...     print('--start--')
     ...     for i in itertools.count():
-    ...         print '--yielding %i--' % i
+    ...         print('--yielding %i--' % i)
     ...         try:
     ...             ans = yield i
     ...         except GeneratorExit:
-    ...             print '--closing--'
+    ...             print('--closing--')
     ...             raise
     ...         except Exception as e:
-    ...             print '--yield raised %r--' % e
+    ...             print('--yield raised %r--' % e)
     ...         else:
-    ...             print '--yield returned %s--' % ans
+    ...             print('--yield returned %s--' % ans)
 
     >>> it = g()
     >>> next(it)
@@ -424,8 +411,8 @@ Decorators
 .. >>> print(A)
 .. None
 
-Since a function or a class are objects, they can be passed
-around. Since they are mutable objects, they can be modified.  The act
+Since functions and classes are objects, they can be passed
+around. Since they are mutable objects, they can be modified. The act
 of altering a function or class object after it has been constructed
 but before is is bound to its name is called decorating.
 
@@ -520,58 +507,58 @@ expression (the part after ``@``) can be either just a name, or a
 call. The bare-name approach is nice (less to type, looks cleaner,
 etc.), but is only possible when no arguments are needed to customise
 the decorator. Decorators written as functions can be used in those
-two cases:
+two cases::
 
->>> def simple_decorator(function):
-...   print "doing decoration"
-...   return function
->>> @simple_decorator
-... def function():
-...   print "inside function"
-doing decoration
->>> function()
-inside function
+    >>> def simple_decorator(function):
+    ...   print("doing decoration")
+    ...   return function
+    >>> @simple_decorator
+    ... def function():
+    ...   print("inside function")
+    doing decoration
+    >>> function()
+    inside function
 
->>> def decorator_with_arguments(arg):
-...   print "defining the decorator"
-...   def _decorator(function):
-...       # in this inner function, arg is available too
-...       print "doing decoration,", arg
-...       return function
-...   return _decorator
->>> @decorator_with_arguments("abc")
-... def function():
-...   print "inside function"
-defining the decorator
-doing decoration, abc
->>> function()
-inside function
+    >>> def decorator_with_arguments(arg):
+    ...   print("defining the decorator")
+    ...   def _decorator(function):
+    ...       # in this inner function, arg is available too
+    ...       print("doing decoration, %r" % arg)
+    ...       return function
+    ...   return _decorator
+    >>> @decorator_with_arguments("abc")
+    ... def function():
+    ...   print("inside function")
+    defining the decorator
+    doing decoration, 'abc'
+    >>> function()
+    inside function
 
 The two trivial decorators above fall into the category of decorators
 which return the original function. If they were to return a new
 function, an extra level of nestedness would be required.
-In the worst case, three levels of nested functions.
+In the worst case, three levels of nested functions. ::
 
->>> def replacing_decorator_with_args(arg):
-...   print "defining the decorator"
-...   def _decorator(function):
-...       # in this inner function, arg is available too
-...       print "doing decoration,", arg
-...       def _wrapper(*args, **kwargs):
-...           print "inside wrapper,", args, kwargs
-...           return function(*args, **kwargs)
-...       return _wrapper
-...   return _decorator
->>> @replacing_decorator_with_args("abc")
-... def function(*args, **kwargs):
-...     print "inside function,", args, kwargs
-...     return 14
-defining the decorator
-doing decoration, abc
->>> function(11, 12)
-inside wrapper, (11, 12) {}
-inside function, (11, 12) {}
-14
+    >>> def replacing_decorator_with_args(arg):
+    ...   print("defining the decorator")
+    ...   def _decorator(function):
+    ...       # in this inner function, arg is available too
+    ...       print("doing decoration, %r" % arg)
+    ...       def _wrapper(*args, **kwargs):
+    ...           print("inside wrapper, %r %r" % (args, kwargs))
+    ...           return function(*args, **kwargs)
+    ...       return _wrapper
+    ...   return _decorator
+    >>> @replacing_decorator_with_args("abc")
+    ... def function(*args, **kwargs):
+    ...     print("inside function, %r %r" % (args, kwargs))
+    ...     return 14
+    defining the decorator
+    doing decoration, 'abc'
+    >>> function(11, 12)
+    inside wrapper, (11, 12) {}
+    inside function, (11, 12) {}
+    14
 
 The ``_wrapper`` function is defined to accept all positional and
 keyword arguments. In general we cannot know what arguments the
@@ -588,25 +575,25 @@ use the argument-less form: the final decorated object would just be
 an instance of the decorating class, returned by the constructor call,
 which is not very useful. Therefore it's enough to discuss class-based
 decorators where arguments are given in the decorator expression and
-the decorator ``__init__`` method is used for decorator construction.
+the decorator ``__init__`` method is used for decorator construction. ::
 
->>> class decorator_class(object):
-...   def __init__(self, arg):
-...       # this method is called in the decorator expression
-...       print "in decorator init,", arg
-...       self.arg = arg
-...   def __call__(self, function):
-...       # this method is called to do the job
-...       print "in decorator call,", self.arg
-...       return function
->>> deco_instance = decorator_class('foo')
-in decorator init, foo
->>> @deco_instance
-... def function(*args, **kwargs):
-...   print "in function,", args, kwargs
-in decorator call, foo
->>> function()
-in function, () {}
+    >>> class decorator_class(object):
+    ...   def __init__(self, arg):
+    ...       # this method is called in the decorator expression
+    ...       print("in decorator init, %s" % arg)
+    ...       self.arg = arg
+    ...   def __call__(self, function):
+    ...       # this method is called to do the job
+    ...       print("in decorator call, %s" % self.arg)
+    ...       return function
+    >>> deco_instance = decorator_class('foo')
+    in decorator init, foo
+    >>> @deco_instance
+    ... def function(*args, **kwargs):
+    ...   print("in function, %s %s" % (args, kwargs))
+    in decorator call, foo
+    >>> function()
+    in function, () {}
 
 Contrary to normal rules (:PEP:`8`) decorators written as classes
 behave more like functions and therefore their name often starts with a
@@ -615,30 +602,30 @@ lowercase letter.
 In reality, it doesn't make much sense to create a new class just to
 have a decorator which returns the original function. Objects are
 supposed to hold state, and such decorators are more useful when the
-decorator returns a new object.
+decorator returns a new object. ::
 
->>> class replacing_decorator_class(object):
-...   def __init__(self, arg):
-...       # this method is called in the decorator expression
-...       print "in decorator init,", arg
-...       self.arg = arg
-...   def __call__(self, function):
-...       # this method is called to do the job
-...       print "in decorator call,", self.arg
-...       self.function = function
-...       return self._wrapper
-...   def _wrapper(self, *args, **kwargs):
-...       print "in the wrapper,", args, kwargs
-...       return self.function(*args, **kwargs)
->>> deco_instance = replacing_decorator_class('foo')
-in decorator init, foo
->>> @deco_instance
-... def function(*args, **kwargs):
-...   print "in function,", args, kwargs
-in decorator call, foo
->>> function(11, 12)
-in the wrapper, (11, 12) {}
-in function, (11, 12) {}
+    >>> class replacing_decorator_class(object):
+    ...   def __init__(self, arg):
+    ...       # this method is called in the decorator expression
+    ...       print("in decorator init, %s" % arg)
+    ...       self.arg = arg
+    ...   def __call__(self, function):
+    ...       # this method is called to do the job
+    ...       print("in decorator call, %s" % self.arg)
+    ...       self.function = function
+    ...       return self._wrapper
+    ...   def _wrapper(self, *args, **kwargs):
+    ...       print("in the wrapper, %s %s" % (args, kwargs))
+    ...       return self.function(*args, **kwargs)
+    >>> deco_instance = replacing_decorator_class('foo')
+    in decorator init, foo
+    >>> @deco_instance
+    ... def function(*args, **kwargs):
+    ...   print("in function, %s %s" % (args, kwargs))
+    in decorator call, foo
+    >>> function(11, 12)
+    in the wrapper, (11, 12) {}
+    in function, (11, 12) {}
 
 A decorator like this can do pretty much anything, since it can modify
 the original function object and mangle the arguments, call the
@@ -657,31 +644,33 @@ and ``__name__`` (the full name of the function), and
 value of the function available in Python 3). This can be done
 automatically by using `functools.update_wrapper`.
 
-.. sidebar:: `functools.update_wrapper(wrapper, wrapped) <functools.update_wrapper>`
+.. topic:: `functools.update_wrapper(wrapper, wrapped) <functools.update_wrapper>`
 
    "Update a wrapper function to look like the wrapped function."
 
->>> import functools
->>> def better_replacing_decorator_with_args(arg):
-...   print "defining the decorator"
-...   def _decorator(function):
-...       print "doing decoration,", arg
-...       def _wrapper(*args, **kwargs):
-...           print "inside wrapper,", args, kwargs
-...           return function(*args, **kwargs)
-...       return functools.update_wrapper(_wrapper, function)
-...   return _decorator
->>> @better_replacing_decorator_with_args("abc")
-... def function():
-...     "extensive documentation"
-...     print "inside function"
-...     return 14
-defining the decorator
-doing decoration, abc
->>> function                           # doctest: +ELLIPSIS
-<function function at 0x...>
->>> print function.__doc__
-extensive documentation
+   ::
+   
+    >>> import functools
+    >>> def replacing_decorator_with_args(arg):
+    ...   print("defining the decorator")
+    ...   def _decorator(function):
+    ...       print("doing decoration, %r" % arg)
+    ...       def _wrapper(*args, **kwargs):
+    ...           print("inside wrapper, %r %r" % (args, kwargs))
+    ...           return function(*args, **kwargs)
+    ...       return functools.update_wrapper(_wrapper, function)
+    ...   return _decorator
+    >>> @replacing_decorator_with_args("abc")
+    ... def function():
+    ...     "extensive documentation"
+    ...     print("inside function")
+    ...     return 14
+    defining the decorator
+    doing decoration, 'abc'
+    >>> function                           # doctest: +ELLIPSIS
+    <function function at 0x...>
+    >>> print(function.__doc__)
+    extensive documentation
 
 One important thing is missing from the list of attributes which can
 be copied to the replacement function: the argument list. The default
@@ -726,7 +715,7 @@ which really form a part of the language:
             data = numpy.load(file)
             return cls(data)
 
-  This is cleaner then using a multitude of flags to ``__init__``.
+  This is cleaner than using a multitude of flags to ``__init__``.
 
 - `staticmethod` is applied to methods to make them "static",
   i.e. basically a normal function, but accessible through the class
@@ -795,22 +784,22 @@ which really form a part of the language:
     >>> class D(object):
     ...    @property
     ...    def a(self):
-    ...      print "getting", 1
+    ...      print("getting 1")
     ...      return 1
     ...    @a.setter
     ...    def a(self, value):
-    ...      print "setting", value
+    ...      print("setting %r" % value)
     ...    @a.deleter
     ...    def a(self):
-    ...      print "deleting"
+    ...      print("deleting")
     >>> D.a                                    # doctest: +ELLIPSIS
     <property object at 0x...>
     >>> D.a.fget                               # doctest: +ELLIPSIS
-    <function a at 0x...>
+    <function ...>
     >>> D.a.fset                               # doctest: +ELLIPSIS
-    <function a at 0x...>
+    <function ...>
     >>> D.a.fdel                               # doctest: +ELLIPSIS
-    <function a at 0x...>
+    <function ...>
     >>> d = D()               # ... varies, this is not the same `a` function
     >>> d.a
     getting 1
@@ -872,7 +861,7 @@ to modify the function, we can use a decorator::
       def _wrapper(self, *args, **kwargs):
 	  self.count += 1
 	  if self.count == 1:
-	      print self.func.__name__, 'is deprecated'
+	      print(self.func.__name__, 'is deprecated')
 	  return self.func(*args, **kwargs)
 
 .. TODO: use update_wrapper here
@@ -892,7 +881,7 @@ It can also be implemented as a function::
       def wrapper(*args, **kwargs):
           count[0] += 1
           if count[0] == 1:
-              print func.__name__, 'is deprecated'
+              print(func.__name__, 'is deprecated')
           return func(*args, **kwargs)
       return wrapper
 
@@ -972,25 +961,24 @@ directly, it would be impossible to distinguish it from an en-dash in
 the source of a program.
 
 .. _`unicode literal notation`:
-   http://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
+   https://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
 
-More examples and reading
-^^^^^^^^^^^^^^^^^^^^^^^^^
+.. seealso:: **More examples and reading**
 
-* :pep:`318` (function and method decorator syntax)
-* :pep:`3129` (class decorator syntax)
-* http://wiki.python.org/moin/PythonDecoratorLibrary
-* http://docs.python.org/dev/library/functools.html
-* http://pypi.python.org/pypi/decorator
-* Bruce Eckel
+    * :pep:`318` (function and method decorator syntax)
+    * :pep:`3129` (class decorator syntax)
+    * http://wiki.python.org/moin/PythonDecoratorLibrary
+    * https://docs.python.org/dev/library/functools.html
+    * http://pypi.python.org/pypi/decorator
+    * Bruce Eckel
 
-  - `Decorators I`_: Introduction to Python Decorators
-  - `Python Decorators II`_: Decorator Arguments
-  - `Python Decorators III`_: A Decorator-Based Build System
-
-.. _`Decorators I`: http://www.artima.com/weblogs/viewpost.jsp?thread=240808
-.. _`Python Decorators II`: http://www.artima.com/weblogs/viewpost.jsp?thread=240845
-.. _`Python Decorators III`: http://www.artima.com/weblogs/viewpost.jsp?thread=241209
+      - `Decorators I`_: Introduction to Python Decorators
+      - `Python Decorators II`_: Decorator Arguments
+      - `Python Decorators III`_: A Decorator-Based Build System
+     
+      .. _`Decorators I`: http://www.artima.com/weblogs/viewpost.jsp?thread=240808
+      .. _`Python Decorators II`: http://www.artima.com/weblogs/viewpost.jsp?thread=240845
+      .. _`Python Decorators III`: http://www.artima.com/weblogs/viewpost.jsp?thread=241209
 
 
 Context managers
@@ -1023,7 +1011,7 @@ leaving only the interesting ``do_something`` block.
    returned by ``__enter__`` is simply ignored.
 2. The block of code underneath ``with`` is executed.  Just like with
    ``try`` clauses, it can either execute successfully to the end, or
-   it can :simple:`break`, :simple:`continue`` or :simple:`return`, or
+   it can :simple:`break`, :simple:`continue` or :simple:`return`, or
    it can throw an exception. Either way, after the block is finished,
    the `__exit__ <object.__exit__>` method is called.
    If an exception was thrown, the information about the exception is
@@ -1043,7 +1031,7 @@ we are done writing to it::
   ...   def __exit__(self, *args):
   ...     self.obj.close()
   >>> with closing(open('/tmp/file', 'w')) as f:
-  ...   f.write('the contents\n')
+  ...   f.write('the contents\n')   # doctest: +SKIP
 
 Here we have made sure that the ``f.close()`` is called when the
 ``with`` block is exited. Since closing files is such a common
@@ -1052,7 +1040,7 @@ class. It has an ``__exit__`` method which calls ``close`` and can be
 used as a context manager itself::
 
   >>> with open('/tmp/file', 'a') as f:
-  ...   f.write('more contents\n')
+  ...   f.write('more contents\n')      # doctest: +SKIP
 
 The common use for ``try..finally`` is releasing resources. Various
 different cases are implemented similarly: in the ``__enter__``

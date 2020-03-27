@@ -1,17 +1,24 @@
-import pylab as pl
+"""
+Horizontal arrangement of subplots
+==================================
 
-pl.figure(figsize=(6, 4))
-pl.subplot(2, 1, 1)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(2,1,1)', ha='center', va='center',
+An example showing horizontal arrangement of subplots with matplotlib.
+"""
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(6, 4))
+plt.subplot(2, 1, 1)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(2,1,1)', ha='center', va='center',
         size=24, alpha=.5)
 
-pl.subplot(2, 1, 2)
-pl.xticks(())
-pl.yticks(())
-pl.text(0.5, 0.5, 'subplot(2,1,2)', ha='center', va='center',
+plt.subplot(2, 1, 2)
+plt.xticks([])
+plt.yticks([])
+plt.text(0.5, 0.5, 'subplot(2,1,2)', ha='center', va='center',
         size=24, alpha=.5)
 
-pl.tight_layout()
-pl.show()
+plt.tight_layout()
+plt.show()

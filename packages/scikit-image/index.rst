@@ -1,11 +1,20 @@
+.. for doctests
+   >>> import numpy as np
+   >>> import scipy.misc
+   >>> np.random.seed(0)
+   >>> import matplotlib.pyplot as plt
+   >>> plt.switch_backend("Agg")
+
 .. _scikit_image:
 
-.. currentmodule:: skimage
-
+==============================
 Scikit-image: image processing
 ==============================
 
-:author: Emmanuelle Gouillart
+.. currentmodule:: skimage
+
+
+**Author**: *Emmanuelle Gouillart*
 
 `scikit-image <http://scikit-image.org/>`_ is a Python package dedicated
 to image processing, and using natively NumPy arrays as image objects.
@@ -29,9 +38,9 @@ modules such as NumPy and SciPy.
 
 
 Introduction and concepts
--------------------------
+=========================
 
-Image = ``np.ndarray``
+Images are NumPy's arrays ``np.ndarray``
 
 :image:
 
@@ -55,91 +64,73 @@ Image = ``np.ndarray``
 
 
 ::
-
-    >>> check = np.zeros((9, 9))
+    
+    >>> import numpy as np
+    >>> check = np.zeros((8, 8))
     >>> check[::2, 1::2] = 1
     >>> check[1::2, ::2] = 1
     >>> import matplotlib.pyplot as plt
-    >>> plt.imshow(check, cmap='gray', interpolation='nearest')
+    >>> plt.imshow(check, cmap='gray', interpolation='nearest') # doctest: +SKIP
 
 
-.. image:: auto_examples/images/plot_check_1.png
+.. image:: auto_examples/images/sphx_glr_plot_check_001.png
     :scale: 60
     :target: auto_examples/plot_check.html
     :align: center
 
 ``scikit-image`` and the ``SciPy`` ecosystem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
-Stable release : 0.8 (included in Canopy and Anaconda)
-
-0.7 release packaged in Ubuntu
+Recent versions of ``scikit-image`` is packaged in most Scientific Python
+distributions, such as Anaconda or Enthought Canopy. It is also packaged
+for Ubuntu/Debian.
 
 ::
 
 
     >>> import skimage
-    >>> from skimage import data, filter  # most functions are in subpackages 
-    >>> from skimage.morphology import disk
+    >>> from skimage import data  # most functions are in subpackages 
+
 
 Most ``scikit-image`` functions take NumPy ``ndarrays`` as arguments ::
 
     >>> camera = data.camera()
     >>> camera.dtype
     dtype('uint8')
-    >>> filtered_camera = filter.rank.median(camera, disk(1))
-    >>> type(filtered_camera)
+    >>> camera.shape
+    (512, 512)
+    >>> from skimage import filters
+    >>> filtered_camera = filters.gaussian(camera, 1)
+    >>> type(filtered_camera)   # doctest: +SKIP
     <type 'numpy.ndarray'>
 
 Other Python packages are available for image processing and work with
 NumPy arrays:
 
- * :mod:`scipy.ndimage` : for nd-arrays (no image magics). Basic
+ * :mod:`scipy.ndimage` : for nd-arrays. Basic
    filtering, mathematical morphology, regions properties
 
  * `Mahotas <http://luispedro.org/software/mahotas>`_
 
 Also, powerful image processing libraries have Python bindings:
 
- * `OpenCV <http://opencv.willowgarage.com/wiki/>`_ (computer vision)
+ * `OpenCV <https://opencv-python-tutroals.readthedocs.org/en/latest/>`_
+   (computer vision)
 
  * `ITK <http://www.itk.org/itkindex.html>`_ (3D images and registration)
 
  * and many others
 
-(but they are less Pythonic and NumPy friendly).
+(but they are less Pythonic and NumPy friendly, to a variable extent).
 
-.. warning:: The ``Image`` wrapper class around ``np.ndarray``
-
-    ``skimage`` is meant to work "natively" with NumPy arrays, and most
-    skimage functions return NumPy arrays. Some functions of the ``data``
-    submodule return instead an instance of the ``Image`` class, which is
-    just a wrapper class around NumPy ``ndarray``.
-
-        >>> camera = data.camera()
-        >>> camera
-        Image([[156, 157, 160, ..., 152, 152, 152],
-               [156, 157, 159, ..., 152, 152, 152],
-               [158, 157, 156, ..., 152, 152, 152],
-               ...,
-               [121, 123, 126, ..., 121, 113, 111],
-               [121, 123, 126, ..., 121, 113, 111],
-               [121, 123, 126, ..., 121, 113, 111]], dtype=uint8)
-        >>> isinstance(camera, np.ndarray)
-        True
-
-    You should just consider that an ``Image`` instance is a regular
-    ``ndarray``.
 
 What's to be found in scikit-image
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 * Website: http://scikit-image.org/
 
-* Gallery of examples (as in
-  `matplotlib <http://matplotlib.org/gallery.html>`_ or
-  `scikit-learn <http://scikit-learn.org>`_):
-  http://scikit-image.org/docs/dev/auto_examples/
+* Gallery of examples:
+  http://scikit-image.org/docs/stable/auto_examples/
 
 Different kinds of functions, from boilerplate utility functions to
 high-level recent algorithms.
@@ -156,7 +147,7 @@ high-level recent algorithms.
  * Other actions: I/O, visualization, etc.
 
 Input/output, data types and colorspaces
-----------------------------------------
+=========================================
 
 I/O: :mod:`skimage.io` ::
 
@@ -165,10 +156,11 @@ I/O: :mod:`skimage.io` ::
 
 Reading from files: :func:`skimage.io.imread` ::
 
+    >>> import os
     >>> filename = os.path.join(skimage.data_dir, 'camera.png')
     >>> camera = io.imread(filename)
 
-.. image:: auto_examples/images/plot_camera_1.png
+.. image:: auto_examples/images/sphx_glr_plot_camera_001.png
     :width: 50%
     :target: auto_examples/plot_camera.html
     :align: center
@@ -187,18 +179,12 @@ Saving to files::
 
 (``imsave`` also uses an external plugin such as PIL)
 
-I/O also available for videos if external backends such as GStreamer
-or OpenCV are present
-::
-
-    >>> movie = io.video.Video('video_file.avi')
-    >>> image_array = movie.get_index_frame(10)
 
 Data types
-~~~~~~~~~~
+-----------
 
 
-.. image:: auto_examples/images/plot_camera_uint_1.png
+.. image:: auto_examples/images/sphx_glr_plot_camera_uint_001.png
     :align: right
     :width: 50%
     :target: auto_examples/plot_camera_uint.html
@@ -224,37 +210,38 @@ unsigned.
     are supposed to lie in [-1, 1] (in order to have comparable contrast for
     all float images) ::
 
-        >>> camera_float = util.img_as_float(camera)
+        >>> from skimage import img_as_float
+        >>> camera_float = img_as_float(camera)
         >>> camera.max(), camera_float.max()
-        (Image(255, dtype=uint8), 1.0)
+        (255, 1.0)
 
 Some image processing routines need to work with float arrays, and may
 hence output an array with a different type and the data range from the
 input array ::
 
-    >>> from skimage import filter
-    >>> camera_sobel = filter.sobel(camera)
-    >>> camera_sobel.max()
-    0.8365106670670005
+    >>> from skimage import filters
+    >>> camera_sobel = filters.sobel(camera)
+    >>> camera_sobel.max() # doctest: +SKIP 
+    0.591502...
 
 
-Utility functions are provided in :mod:`skimage.util` to convert both the
+Utility functions are provided in :mod:`skimage` to convert both the
 dtype and the data range, following skimage's conventions:
 ``util.img_as_float``, ``util.img_as_ubyte``, etc.
 
 See the `user guide
-<http://scikit-image.org/docs/0.8.0/user_guide/data_types.html>`_ for
+<http://scikit-image.org/docs/stable/user_guide/data_types.html>`_ for
 more details.
 
 Colorspaces
-~~~~~~~~~~~
+------------
 
 Color images are of shape (N, M, 3) or (N, M, 4) (when an alpha channel
 encodes transparency) ::
 
-    >>> lena = data.lena()
-    >>> lena.shape
-    (512, 512, 3)
+    >>> face = scipy.misc.face()
+    >>> face.shape
+    (768, 1024, 3)
 
 
 Routines converting between different colorspaces (RGB, HSV, LAB etc.)
@@ -264,7 +251,7 @@ images.
 
 .. topic:: 3D images
 
-    Some functions of ``skimage`` can take 3D images as input arguments.
+    Most functions of ``skimage`` can take 3D images as input arguments.
     Check the docstring to know if a function can be used on 3D images
     (for example MRI or CT images).
 
@@ -281,13 +268,13 @@ images.
     Convert the image to grayscale and plot its histogram.
 
 Image preprocessing / enhancement
----------------------------------
+==================================
 
 Goals: denoising, feature (edges) extraction, ...
 
 
 Local filters
-~~~~~~~~~~~~~
+--------------
 
 Local filters replace the value of pixels by a function of the
 values of neighboring pixels. The function can be linear or non-linear.
@@ -302,7 +289,7 @@ Neighbourhood: square (choose size), disk, or more complicated
 Example : horizontal Sobel filter ::
 
     >>> text = data.text()
-    >>> hsobel_text = filter.hsobel(text)
+    >>> hsobel_text = filters.sobel_h(text)
 
 
 Uses the following linear kernel for computing horizontal gradients::
@@ -311,33 +298,34 @@ Uses the following linear kernel for computing horizontal gradients::
     0   0   0
     -1  -2  -1
 
-.. image:: auto_examples/images/plot_sobel_1.png
+.. image:: auto_examples/images/sphx_glr_plot_sobel_001.png
     :width: 70%
     :target: auto_examples/plot_sobel.html
     :align: center
 
 
 Non-local filters
-~~~~~~~~~~~~~~~~~
+-----------------
 
 Non-local filters use a large region of the image (or all the image) to
 transform the value of one pixel::
 
+    >>> from skimage import exposure
     >>> camera = data.camera()
     >>> camera_equalized = exposure.equalize_hist(camera)
-    >>> # Rk: use instead exposure.equalize in skimage 0.7
 
 Enhances contrast in large almost uniform regions.
 
-.. image:: auto_examples/images/plot_equalize_hist_1.png
+.. image:: auto_examples/images/sphx_glr_plot_equalize_hist_001.png
     :width: 70%
     :target: auto_examples/plot_equalize_hist.html
     :align: center
 
 Mathematical morphology
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
-See http://en.wikipedia.org/wiki/Mathematical_morphology
+See `wikipedia <https://en.wikipedia.org/wiki/Mathematical_morphology>`_
+for an introduction on mathematical morphology.
 
 Probe an image with a simple shape (a **structuring element**), and
 modify this image according to how the shape locally fits or misses the
@@ -357,7 +345,7 @@ Default structuring element: 4-connectivity of a pixel ::
 
 **Erosion** = minimum filter. Replace the value of a pixel by the minimal value covered by the structuring element.::
 
-    >>> a = np.zeros((7,7), dtype=np.int)
+    >>> a = np.zeros((7,7), dtype=np.uint8)
     >>> a[1:6, 2:5] = 1
     >>> a
     array([[0, 0, 0, 0, 0, 0, 0],
@@ -366,7 +354,7 @@ Default structuring element: 4-connectivity of a pixel ::
            [0, 0, 1, 1, 1, 0, 0],
            [0, 0, 1, 1, 1, 0, 0],
            [0, 0, 1, 1, 1, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0]])
+           [0, 0, 0, 0, 0, 0, 0]], dtype=uint8)
     >>> morphology.binary_erosion(a, morphology.diamond(1)).astype(np.uint8)
     array([[0, 0, 0, 0, 0, 0, 0],
            [0, 0, 0, 0, 0, 0, 0],
@@ -390,11 +378,11 @@ Default structuring element: 4-connectivity of a pixel ::
     >>> a = np.zeros((5, 5))
     >>> a[2, 2] = 1
     >>> a
-    array([[ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.],
-           [ 0.,  0.,  0.,  0.,  0.]])
+    array([[0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  1.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.],
+           [0.,  0.,  0.,  0.,  0.]])
     >>> morphology.binary_dilation(a, morphology.diamond(1)).astype(np.uint8)
     array([[0, 0, 0, 0, 0],
            [0, 0, 1, 0, 0],
@@ -442,52 +430,57 @@ skeletonization, etc.
 
     ::
 
-        >>> from skimage import filter
         >>> from skimage.morphology import disk
         >>> coins = data.coins()
         >>> coins_zoom = coins[10:80, 300:370]
-        >>> median_coins = filter.rank.median(coins_zoom,disk(1))
-        >>> tv_coins = filter.denoise_tv_chambolle(coins_zoom, weight=0.1)
-        >>> from scipy import ndimage
-        >>> gaussian_coins = ndimage.gaussian_filter(coins, sigma=2)
+        >>> median_coins = filters.median(coins_zoom, disk(1))
+        >>> from skimage import restoration
+        >>> tv_coins = restoration.denoise_tv_chambolle(coins_zoom, weight=0.1)
+        >>> gaussian_coins = filters.gaussian(coins, sigma=2)
 
-    .. image:: auto_examples/images/plot_filter_coins_1.png
+    .. image:: auto_examples/images/sphx_glr_plot_filter_coins_001.png
         :width: 99%
         :target: auto_examples/plot_filter_coins.html
 
 Image segmentation
-------------------
+===================
 
-Segmentation = filter that maps an image onto an image of labels
-corresponding to different regions.
+Image segmentation is the attribution of different labels to different
+regions of the image, for example in order to extract the pixels of an
+object of interest.
 
 Binary segmentation: foreground + background
-.............................................
+---------------------------------------------
 
 Histogram-based method: **Otsu thresholding**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
-   The `Otsu method <http://en.wikipedia.org/wiki/Otsu's_method>`_ is a
+   The `Otsu method <https://en.wikipedia.org/wiki/Otsu%27s_method>`_ is a
    simple heuristic to find a threshold to separate the foreground from
    the background.
+
+.. sidebar:: Earlier scikit-image versions
+
+   :mod:`skimage.filters` is called :mod:`skimage.filter` in earlier
+   versions of scikit-image
 
 ::
 
     from skimage import data
-    from skimage import filter
+    from skimage import filters
     camera = data.camera()
-    val = filter.threshold_otsu(camera)
+    val = filters.threshold_otsu(camera)
     mask = camera < val
 
-.. image:: auto_examples/images/plot_threshold_1.png
+.. image:: auto_examples/images/sphx_glr_plot_threshold_001.png
     :width: 70%
     :target: auto_examples/plot_threshold.html
     :align: center
 
 Labeling connected components of a discrete image
-..................................................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
@@ -500,21 +493,22 @@ Synthetic data::
     >>> n = 20
     >>> l = 256
     >>> im = np.zeros((l, l))
-    >>> points = l*np.random.random((2, n**2))
+    >>> points = l * np.random.random((2, n ** 2))
     >>> im[(points[0]).astype(np.int), (points[1]).astype(np.int)] = 1
-    >>> im = ndimage.gaussian_filter(im, sigma=l/(4.*n))
+    >>> im = filters.gaussian(im, sigma=l / (4. * n))
     >>> blobs = im > im.mean()
 
 Label all connected components::
 
-    >>> all_labels = morphology.label(blobs)
+    >>> from skimage import measure
+    >>> all_labels = measure.label(blobs)
 
 Label only foreground connected components::
 
-    >>> blobs_labels = morphology.label(blobs, background=0)
+    >>> blobs_labels = measure.label(blobs, background=0)
 
 
-.. image:: auto_examples/images/plot_labels_1.png
+.. image:: auto_examples/images/sphx_glr_plot_labels_001.png
     :width: 90%
     :target: auto_examples/plot_labels.html
     :align: center
@@ -525,16 +519,16 @@ Label only foreground connected components::
    object in an image.
 
 Marker based methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 If you have markers inside a set of regions, you can use these to segment
 the regions.
 
 *Watershed* segmentation
-..........................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Watershed (:func:`skimage.morphology.watershed`) is a region-growing
-approach that fills "bassins" in the image ::
+approach that fills "basins" in the image ::
 
     >>> from skimage.morphology import watershed
     >>> from skimage.feature import peak_local_max
@@ -543,31 +537,32 @@ approach that fills "bassins" in the image ::
     >>> x, y = np.indices((80, 80))
     >>> x1, y1, x2, y2 = 28, 28, 44, 52
     >>> r1, r2 = 16, 20
-    >>> mask_circle1 = (x - x1)**2 + (y - y1)**2 < r1**2
-    >>> mask_circle2 = (x - x2)**2 + (y - y2)**2 < r2**2
+    >>> mask_circle1 = (x - x1) ** 2 + (y - y1) ** 2 < r1 ** 2
+    >>> mask_circle2 = (x - x2) ** 2 + (y - y2) ** 2 < r2 ** 2
     >>> image = np.logical_or(mask_circle1, mask_circle2)
     >>> # Now we want to separate the two objects in image
     >>> # Generate the markers as local maxima of the distance
     >>> # to the background
     >>> from scipy import ndimage
     >>> distance = ndimage.distance_transform_edt(image)
-    >>> local_maxi = peak_local_max(distance, indices=False, footprint=np.ones((3, 3)),labels=image)
+    >>> local_maxi = peak_local_max(distance, indices=False, footprint=np.ones((3, 3)), labels=image)
     >>> markers = morphology.label(local_maxi)
     >>> labels_ws = watershed(-distance, markers, mask=image)
 
 *Random walker* segmentation
-..............................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The random walker algorithm (:func:`skimage.segmentation.random_walker`)
-is similar to the Watershed, but with a more "probabilistic" appraoch. It
+is similar to the Watershed, but with a more "probabilistic" approach. It
 is based on the idea of the diffusion of labels in the image::
 
+    >>> from skimage import segmentation
     >>> # Transform markers image so that 0-valued pixels are to
     >>> # be labelled, and -1-valued pixels represent background
     >>> markers[~image] = -1
     >>> labels_rw = segmentation.random_walker(image, markers)
 
-.. image:: auto_examples/images/plot_segmentations_1.png
+.. image:: auto_examples/images/sphx_glr_plot_segmentations_001.png
     :width: 90%
     :target: auto_examples/plot_segmentations.html
     :align: center
@@ -597,18 +592,19 @@ is based on the idea of the diffusion of labels in the image::
 
 
 Measuring regions' properties
------------------------------
+==============================
 
 ::
 
     >>> from skimage import measure
-    >>> measure.regionprops?
 
 Example: compute the size and perimeter of the two segmented regions::
 
-    >>> measure.regionprops(labels_rw, properties=['Area', 'Perimeter'])
-    [{'Perimeter': 117.25483399593905, 'Area': 770.0, 'Label': 1},
-    {'Perimeter': 149.1543289325507, 'Area': 1168.0, 'Label': 2}]
+    >>> properties = measure.regionprops(labels_rw)
+    >>> [prop.area for prop in properties]
+    [770, 1168]
+    >>> [prop.perimeter for prop in properties] # doctest: +ELLIPSIS
+    [100.91..., 126.81...]
 
 .. seealso::
 
@@ -617,7 +613,7 @@ Example: compute the size and perimeter of the two segmented regions::
    returned).
 
 
-.. topic:: Exercise (cont'd)
+.. topic:: Exercise (continued)
    :class: green
 
     * Use the binary image of the coins and background from the previous
@@ -628,7 +624,7 @@ Example: compute the size and perimeter of the two segmented regions::
     * Compute the size and eccentricity of all coins.
 
 Data visualization and interaction
-----------------------------------
+===================================
 
 Meaningful visualizations are useful when testing a given processing
 pipeline.
@@ -636,29 +632,30 @@ pipeline.
 Some image processing operations::
 
     >>> coins = data.coins()
-    >>> mask = coins > filter.threshold_otsu(coins)
+    >>> mask = coins > filters.threshold_otsu(coins)
     >>> clean_border = segmentation.clear_border(mask)
 
 Visualize binary result::
 
-    >>> plt.figure()
-    >>> plt.imshow(clean_border, cmap='gray')
+    >>> plt.figure() # doctest: +ELLIPSIS
+    <Figure size ... with 0 Axes>
+    >>> plt.imshow(clean_border, cmap='gray') # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
 
 Visualize contour ::
 
-    >>> plt.figure()
-    >>> plt.imshow(coins, cmap='gray')
-    >>> plt.contour(clean_border, [0.5])
+    >>> plt.figure() # doctest: +ELLIPSIS
+    <Figure size ... with 0 Axes>
+    >>> plt.imshow(coins, cmap='gray') # doctest: +ELLIPSIS
+    <matplotlib.image.AxesImage object at 0x...>
+    >>> plt.contour(clean_border, [0.5]) # doctest: +ELLIPSIS
+    <matplotlib.contour.QuadContourSet ...>
 
 Use ``skimage`` dedicated utility function::
 
-    >>> # In >= 0.8
-    >>> coins_edges = segmentation.mark_boundaries(coins, clean_border)
-    >>> # In 0.7
-    >>> # segmentation.visualize_boundaries(color.gray2rgb(coins), clean_border)
-    >>> plt.imshow(coins_edges)
+    >>> coins_edges = segmentation.mark_boundaries(coins, clean_border.astype(np.int))
 
-.. image:: auto_examples/images/plot_boundaries_1.png
+.. image:: auto_examples/images/sphx_glr_plot_boundaries_001.png
     :width: 90%
     :target: auto_examples/plot_boundaries.html
     :align: center
@@ -669,23 +666,23 @@ Use ``skimage`` dedicated utility function::
 experimental Qt-based GUI-toolkit ::
 
     >>> from skimage import viewer
-    >>> new_viewer = viewer.ImageViewer(coins)
-    >>> new_viewer.show()
+    >>> new_viewer = viewer.ImageViewer(coins) # doctest: +SKIP
+    >>> new_viewer.show() # doctest: +SKIP
 
 Useful for displaying pixel values.
 
 For more interaction, plugins can be added to the viewer::
 
-    >>> new_viewer = viewer.ImageViewer(coins)
+    >>> new_viewer = viewer.ImageViewer(coins) # doctest: +SKIP
     >>> from skimage.viewer.plugins import lineprofile
-    >>> new_viewer += lineprofile.LineProfile()
-    >>> new_viewer.show()
+    >>> new_viewer += lineprofile.LineProfile() # doctest: +SKIP
+    >>> new_viewer.show() # doctest: +SKIP
 
 .. image:: viewer.png
     :align: center
 
 Feature extraction for computer vision
---------------------------------------
+=======================================
 
 Geometric or textural descriptor can be extracted from images in order to
 
@@ -694,7 +691,7 @@ Geometric or textural descriptor can be extracted from images in order to
 * match parts of different images (e.g. for object detection)
 
 * and many other applications of
-  `Computer Vision <http://en.wikipedia.org/wiki/Computer_vision>`_
+  `Computer Vision <https://en.wikipedia.org/wiki/Computer_vision>`_
 
 ::
 
@@ -713,14 +710,25 @@ Example: detecting corners using Harris detector ::
     coords = corner_peaks(corner_harris(image), min_distance=5)
     coords_subpix = corner_subpix(image, coords, window_size=13)
 
-.. image:: auto_examples/images/plot_features_1.png
+.. image:: auto_examples/images/sphx_glr_plot_features_001.png
     :width: 90%
     :target: auto_examples/plot_features.html
     :align: center
 
-(this example is taken from
-http://scikit-image.org/docs/dev/auto_examples/plot_corner.html)
+(this example is taken from the `plot_corner
+<http://scikit-image.org/docs/stable/auto_examples/features_detection/plot_corner.html>`_
+example in scikit-image)
 
 Points of interest such as corners can then be used to match objects in
-different images, as described in
-http://scikit-image.org/docs/dev/auto_examples/plot_matching.html
+different images, as described in the `plot_matching 
+<http://scikit-image.org/docs/stable/auto_examples/transform/plot_matching.html>`_
+example of scikit-image.
+
+Full code examples
+==================
+
+.. include the gallery. Skip the first line to avoid the "orphan"
+   declaration
+
+.. include:: auto_examples/index.rst
+    :start-line: 1
